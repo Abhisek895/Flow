@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Counter - CountTracker Pro</title>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/counter.css">
+    <style>
+        #temp-content {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app-layout">
+        <div class="loader-container">
+            <div class="spinner"></div>
+        </div>
+    </div>
+
+    <!-- Content to be injected into the layout -->
+    <div id="temp-content">
+        <div class="counter-container">
+
+            <div class="counter-display-card" style="position: relative; padding-top: 3.5rem;">
+                
+                <button class="btn btn-danger btn-icon" id="btn-reset" title="Reset Session" style="position: absolute; top: 1rem; left: 1rem;">
+                    <i class="ph ph-arrow-counter-clockwise" style="font-size: 1.5rem;"></i>
+                </button>
+
+                <div class="session-timer" id="session-timer" style="margin-top: -1.5rem; margin-bottom: 0.5rem;">
+                    <i class="ph ph-timer"></i> 00h 00m 00s
+                </div>
+
+                <button class="btn btn-secondary btn-icon" id="btn-history-shortcut" title="View History" style="position: absolute; top: 1rem; right: 1rem;" onclick="window.location.href='history.html'">
+                    <i class="ph ph-clock-counter-clockwise" style="font-size: 1.5rem;"></i>
+                </button>
+
+                <div class="counter-number" id="counter-display" style="margin-top: 1rem;">0</div>
+
+                <div class="counter-actions" style="margin-top: 2rem; width: 100%;">
+                    <button class="btn-increment" id="btn-increment" title="Increment (+1)">
+                        <i class="ph ph-plus" style="font-size: 2rem;"></i> <span style="font-size: 1.75rem; font-weight: 700; margin-left: 0.5rem;">Increment</span>
+                    </button>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 2rem; width: 100%; flex-wrap: wrap;">
+                <!-- Milestones -->
+                <div class="milestone-container" style="flex: 1; min-width: 300px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h3 class="section-title" style="margin: 0;"><i class="ph ph-flag-checkered"></i> Milestones
+                        </h3>
+                        <span class="text-secondary" id="latest-milestone-time" style="font-size: 0.875rem;"></span>
+                    </div>
+                    <div class="milestone-chips" id="milestone-chips">
+                        <div class="chip" data-val="10">10</div>
+                        <div class="chip" data-val="25">25</div>
+                        <div class="chip" data-val="50">50</div>
+                        <div class="chip" data-val="100">100</div>
+                        <div class="chip" data-val="500">500</div>
+                        <div class="chip" data-val="1000">1000</div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="milestone-container" style="flex: 1; min-width: 300px;">
+                    <h3 class="section-title" style="margin: 0 0 1rem 0;"><i class="ph ph-activity"></i> Recent Activity
+                    </h3>
+                    <div class="mini-activity" id="mini-activity-list">
+                        <!-- Populated via JS -->
+                        <div class="text-center text-secondary">Start counting to see activity</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="../js/utils.js"></script>
+    <script src="../js/db.js"></script>
+    <script src="../js/ui.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/app.js"></script>
+    <!-- Confetti Library for Gamification -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="../js/counter.js"></script>
+</body>
+
+</html>

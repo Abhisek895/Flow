@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - CountTracker Pro</title>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/profile.css">
+    <style>
+        #temp-content { display: none; }
+    </style>
+</head>
+<body>
+    <div id="app-layout">
+        <div class="loader-container">
+            <div class="spinner"></div>
+        </div>
+    </div>
+
+    <div id="temp-content">
+        <div class="profile-container">
+            <!-- Header -->
+            <div class="profile-header-card">
+                <div class="profile-avatar-large" id="profile-avatar">U</div>
+                <div class="profile-info">
+                    <h2 id="profile-username">Loading...</h2>
+                    <p id="profile-joined">Member since: ...</p>
+                </div>
+            </div>
+
+            <!-- App Settings -->
+            <div class="settings-group">
+                <div class="settings-group-header">
+                    <i class="ph ph-gear"></i> Application Settings
+                </div>
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <h4>Dark Theme</h4>
+                        <p>Switch between light and dark visual aesthetics.</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="theme-toggle">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <!-- Notifications Toggle -->
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <h4>Daily Devotionals</h4>
+                        <p>Receive push notifications 5 times a day (5 AM, 1 PM, 3 PM, 5 PM, 7 PM) with inspiring quotes. <br><small class="text-secondary">(App tab must be open)</small></p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="notifications-toggle">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Data Management -->
+            <div class="settings-group">
+                <div class="settings-group-header">
+                    <i class="ph ph-database"></i> Data & Storage
+                </div>
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <h4>Export Data</h4>
+                        <p>Download your complete counting history as a JSON file.</p>
+                    </div>
+                    <div>
+                        <button class="btn btn-secondary" id="btn-export">
+                            <i class="ph ph-download-simple"></i> Export
+                        </button>
+                    </div>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <h4>Import Data</h4>
+                        <p>Restore history from a previously exported JSON file.</p>
+                        <input type="file" id="file-import" accept=".json" style="display:none;">
+                    </div>
+                    <div>
+                        <button class="btn btn-secondary" onclick="document.getElementById('file-import').click()">
+                            <i class="ph ph-upload-simple"></i> Import
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Danger Zone -->
+            <div class="settings-group danger-zone-card">
+                <div class="settings-group-header danger-zone-header">
+                    <i class="ph ph-warning-octagon"></i> Danger Zone
+                </div>
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <h4>Reset Active Counter</h4>
+                        <p>Reset the current active counter securely, without keeping history of this active session.</p>
+                    </div>
+                    <div>
+                        <button class="btn btn-warning-outline" id="btn-soft-reset">
+                            <i class="ph ph-arrow-counter-clockwise"></i> Reset Active
+                        </button>
+                    </div>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <h4 class="text-danger">Delete All Data</h4>
+                        <p>Permanently wipe all your sessions, history, and stats. This cannot be undone.</p>
+                    </div>
+                    <div>
+                        <button class="btn btn-danger" id="btn-wipe-data">
+                            <i class="ph ph-trash"></i> Delete Data
+                        </button>
+                    </div>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <h4 class="text-danger">Delete Account</h4>
+                        <p>Permanently delete your entire account and all data. Requires password.</p>
+                    </div>
+                    <div>
+                        <button class="btn btn-danger" id="btn-delete-account">
+                            <i class="ph ph-user-minus"></i> Delete Account
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="../js/utils.js"></script>
+    <script src="../js/db.js"></script>
+    <script src="../js/ui.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/app.js"></script>
+    <script src="../js/profile.js"></script>
+</body>
+</html>

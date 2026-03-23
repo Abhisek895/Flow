@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - CountTracker Pro</title>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <!-- Chart.js via CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        #temp-content { display: none; }
+    </style>
+</head>
+<body>
+    <div id="app-layout">
+        <div class="loader-container">
+            <div class="spinner"></div>
+        </div>
+    </div>
+
+    <!-- Content to be injected into the layout -->
+    <div id="temp-content">
+        <!-- Quick Actions -->
+        <div class="dashboard-section" style="margin-bottom: 1.5rem; display: flex; gap: 1rem; align-items: center; justify-content: space-between;">
+            <div>
+                <h3 style="font-size: 1.5rem; margin-bottom: 0.25rem;">Welcome back, <span id="fw-username">Loading...</span></h3>
+                <p class="text-secondary">Here's what's happening with your counts today.</p>
+            </div>
+            <a href="counter.html" class="btn btn-primary">
+                <i class="ph ph-play"></i> Start Counting
+            </a>
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- Active Count Card -->
+            <div class="card stat-card card-gradient-1">
+                <div class="stat-header">
+                    <span>Current Active Count</span>
+                    <i class="ph ph-pulse stat-icon"></i>
+                </div>
+                <div class="stat-value" id="stat-active-count">0</div>
+                <div class="stat-footer">
+                    <i class="ph ph-clock"></i> <span id="stat-active-duration">Not started</span>
+                </div>
+            </div>
+
+            <!-- Today's Total -->
+            <div class="card stat-card">
+                <div class="stat-header">
+                    <span>Today's Total Count</span>
+                    <i class="ph ph-calendar-check stat-icon"></i>
+                </div>
+                <div class="stat-value" id="stat-today-count">0</div>
+                <div class="stat-footer">
+                    Across <span id="stat-today-sessions" style="margin: 0 4px; font-weight: 500;">0</span> sessions
+                </div>
+            </div>
+
+            <!-- Total Lifetime Count -->
+            <div class="card stat-card">
+                <div class="stat-header">
+                    <span>Lifetime Total</span>
+                    <i class="ph ph-infinity stat-icon"></i>
+                </div>
+                <div class="stat-value" id="stat-lifetime-count">0</div>
+                <div class="stat-footer">
+                    <i class="ph ph-trend-up stat-trend up"></i> Keep it up!
+                </div>
+            </div>
+
+            <!-- Highest Single Session -->
+            <div class="card stat-card">
+                <div class="stat-header">
+                    <span>Highest Session</span>
+                    <i class="ph ph-trophy stat-icon" style="color:var(--warning); background:rgba(245, 158, 11, 0.1)"></i>
+                </div>
+                <div class="stat-value" id="stat-highest-session">0</div>
+                <div class="stat-footer">
+                    Best single run count
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="dashboard-section">
+            <h3 class="section-title"><i class="ph ph-chart-line"></i> Recent Activity</h3>
+            <div class="charts-grid">
+                <div class="card" style="display: flex; flex-direction: column;">
+                    <h4 style="margin-bottom: 1rem; color: var(--text-secondary); font-size: 0.875rem; text-transform: uppercase;">Count Per Day (Last 7 Days)</h4>
+                    <div style="position: relative; height: 250px; width: 100%; flex: 1;">
+                        <canvas id="weeklyChart"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                    <h4 style="margin-bottom: 1rem; color: var(--text-secondary); font-size: 0.875rem; text-transform: uppercase;">Recent Sessions History</h4>
+                    <div id="recent-sessions-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                        <!-- List populated by js -->
+                        <div class="text-secondary text-center" style="padding: 2rem 0;">No recent sessions found</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../js/utils.js"></script>
+    <script src="../js/db.js"></script>
+    <script src="../js/ui.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            await initApp('dashboard'); // Highlights dashboard in sidebar
+            if (!currentUser) return;
+
+            document.getElementById('fw-username').textContent = currentUser.username;
+            
+            // Load stats dynamically
+            await loadDashboardStats(currentUser.id);
+        });
+
+        async function loadDashboardStats(userId) {
+            try {
+                // 1. Get all sessions
+                let sessions = await db.sessions.getByUser(userId);
+                sessions.sort((a,b) => new Date(b.startedAt) - new Date(a.startedAt)); // Newest first
+
+                // Handle Active Session
+                const activeSessionId = currentUser.activeSessionId;
+                let activeSession = null;
+                if (activeSessionId) {
+                    activeSession = await db.sessions.get(activeSessionId);
+                }
+
+                if (activeSession) {
+                    document.getElementById('stat-active-count').textContent = activeSession.endCount;
+                    // Simple duration mock if active
+                    const startTime = new Date(activeSession.startedAt).getTime();
+                    const now = new Date().getTime();
+                    const diffMins = Math.floor((now - startTime) / 60000);
+                    document.getElementById('stat-active-duration').textContent = diffMins < 1 ? 'Just started' : `${diffMins} mins active`;
+                } else {
+                    document.getElementById('stat-active-count').textContent = '0';
+                    document.getElementById('stat-active-duration').textContent = 'No active session';
+                }
+
+                // Calculate Lifetime
+                let lifetimeTotal = 0;
+                let highest = 0;
+                sessions.forEach(s => {
+                    lifetimeTotal += s.totalIncrements;
+                    if (s.totalIncrements > highest) highest = s.totalIncrements;
+                });
+                
+                document.getElementById('stat-lifetime-count').textContent = lifetimeTotal.toLocaleString();
+                document.getElementById('stat-highest-session').textContent = highest.toLocaleString();
+
+                // Calculate Today's stats
+                const todayStr = getLocalDateString();
+                const todayStat = await db.dailyStats.get(`${userId}_${todayStr}`);
+                
+                if (todayStat) {
+                    document.getElementById('stat-today-count').textContent = todayStat.totalCount.toLocaleString();
+                    document.getElementById('stat-today-sessions').textContent = todayStat.sessionsCount;
+                } else {
+                    document.getElementById('stat-today-count').textContent = '0';
+                    document.getElementById('stat-today-sessions').textContent = '0';
+                }
+
+                // Render Chart
+                renderChart(userId);
+                
+                // Render Recent Runs
+                renderRecentSessions(sessions.slice(0, 4));
+
+            } catch (err) {
+                console.error("Failed to load dashboard stats", err);
+            }
+        }
+
+        async function renderChart(userId) {
+            const ctx = document.getElementById('weeklyChart').getContext('2d');
+            
+            // Get last 7 days strings
+            const dates = [];
+            const labels = [];
+            for(let i=6; i>=0; i--) {
+                const d = new Date();
+                d.setDate(d.getDate() - i);
+                dates.push(getLocalDateString(d));
+                labels.push(d.toLocaleDateString('en-US', { weekday: 'short' }));
+            }
+
+            // Fetch daily stats
+            const dataCounts = [];
+            for (let i = 0; i < dates.length; i++) {
+                const stat = await db.dailyStats.get(`${userId}_${dates[i]}`);
+                dataCounts.push(stat ? stat.totalCount : 0);
+            }
+
+            const chartColor = getComputedStyle(document.documentElement).getPropertyValue('--brand-primary').trim() || '#3b82f6';
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Counts',
+                        data: dataCounts,
+                        backgroundColor: chartColor,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+                        x: { grid: { display: false } }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+        
+        function renderRecentSessions(recentSessions) {
+            const container = document.getElementById('recent-sessions-list');
+            if (recentSessions.length === 0) return;
+            
+            container.innerHTML = recentSessions.map(session => `
+                <div style="display:flex; justify-content:space-between; align-items:center; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--surface-hover);">
+                    <div style="display:flex; flex-direction:column; gap:0.25rem;">
+                        <span style="font-weight:600; font-size:0.875rem;">${session.status === 'active' ? '🟢 Active Session' : 'End Count: ' + session.endCount}</span>
+                        <span class="text-secondary" style="font-size:0.75rem;">Started: ${formatDate(session.startedAt)}</span>
+                    </div>
+                    <div style="font-weight:700; color:var(--brand-primary); font-size:1.125rem;">
+                        +${session.totalIncrements}
+                    </div>
+                </div>
+            `).join('');
+        }
+    </script>
+</body>
+</html>

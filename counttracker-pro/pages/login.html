@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - CountTracker Pro</title>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/auth.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <script src="../js/utils.js"></script>
+    <script src="../js/db.js"></script>
+    <script src="../js/ui.js"></script>
+    <script src="../js/auth.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Redirect if already logged in
+            const user = await getActiveUser();
+            if (user) {
+                window.location.href = 'dashboard.html';
+                return;
+            }
+
+            const form = document.getElementById('login-form');
+            const errorElement = document.getElementById('error-msg');
+            const btn = document.getElementById('submit-btn');
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                errorElement.textContent = '';
+                
+                const username = form.username.value.trim();
+                const password = form.password.value;
+
+                if (!username || !password) {
+                    errorElement.textContent = 'Please fill in all fields.';
+                    return;
+                }
+
+                btn.disabled = true;
+                btn.innerHTML = '<i class="ph ph-spinner-gap ph-spin"></i> Logging in...';
+
+                try {
+                    await login(username, password);
+                    showToast('Login successful!');
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 500);
+                } catch (err) {
+                    errorElement.textContent = err.message || 'Login failed.';
+                    btn.disabled = false;
+                    btn.innerHTML = 'Sign In';
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="auth-logo">
+                    <i class="ph ph-chart-line-up"></i>
+                </div>
+                <h1 class="auth-title">Welcome Back</h1>
+                <p class="auth-subtitle">Sign in to continue counting</p>
+            </div>
+
+            <div id="error-msg" class="error-msg"></div>
+
+            <form id="login-form" class="auth-form">
+                <div class="input-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" placeholder="Enter your username" autocomplete="username">
+                </div>
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Enter your password" autocomplete="current-password">
+                </div>
+                <button type="submit" id="submit-btn" class="btn btn-primary">Sign In</button>
+            </form>
+
+            <div class="auth-footer">
+                Don't have an account? <a href="register.html">Sign up</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

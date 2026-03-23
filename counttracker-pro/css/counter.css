@@ -1,0 +1,186 @@
+/*
+* counter.css - specific to the counter page
+*/
+
+.counter-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 800px;
+    margin: 0 auto;
+    gap: 2rem;
+}
+
+.counter-display-card {
+    background: linear-gradient(135deg, var(--bg-color), var(--surface-hover));
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-color);
+    padding: 3rem 2rem;
+    width: 100%;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.counter-number {
+    font-size: 8rem;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    will-change: transform;
+    transform: translateZ(0);
+}
+
+@media (max-width: 480px) {
+    .counter-number {
+        font-size: 5rem;
+    }
+
+    .counter-display-card {
+        padding: 2rem 1rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .counter-number {
+        font-size: 4rem;
+    }
+
+    .counter-display-card {
+        padding: 1.5rem 0.5rem;
+    }
+
+    .milestone-chip {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.7rem;
+    }
+
+    .btn-increment {
+        font-size: 1.25rem;
+        padding: 1rem 1.75rem;
+    }
+}
+
+.counter-number.bump {
+    transform: scale(1.1);
+}
+
+.session-timer {
+    font-size: 1.25rem;
+    color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.counter-actions {
+    display: flex;
+    gap: 1.5rem;
+    width: 100%;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.btn-increment {
+    width: 100%;
+    height: 100px;
+    border-radius: var(--radius-lg);
+    font-size: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+    color: white;
+    box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.5);
+    transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.15s ease;
+    border: 4px solid var(--surface-color);
+    will-change: transform, box-shadow;
+    transform: translateZ(0);
+}
+
+.btn-increment:hover {
+    transform: scale(1.05) translateY(-5px);
+    box-shadow: 0 20px 25px -5px rgba(59, 130, 246, 0.6);
+}
+
+.btn-increment:active {
+    transform: scale(0.95);
+}
+
+.milestone-container {
+    width: 100%;
+    background-color: var(--surface-color);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-color);
+}
+
+.milestone-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.chip {
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-full);
+    font-size: 0.875rem;
+    font-weight: 600;
+    background-color: var(--surface-hover);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    transition: all var(--transition-fast);
+}
+
+.chip.reached {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+/* Mini Activity List */
+.mini-activity {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.activity-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    background-color: var(--surface-hover);
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+}
+
+.chip.special-avg {
+    border-color: var(--brand-primary);
+    color: var(--brand-primary);
+    font-weight: 600;
+}
+.chip.special-avg.reached {
+    background: var(--brand-primary);
+    color: white;
+}
+.chip.special-record {
+    border-color: #ef4444;
+    color: #ef4444;
+    font-weight: 700;
+    box-shadow: 0 0 10px rgba(239,68,68,0.2);
+}
+.chip.special-record.reached {
+    background: #ef4444;
+    color: white;
+    box-shadow: 0 0 15px rgba(239,68,68,0.5);
+}

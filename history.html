@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>History Page</title>
+  <link rel="stylesheet" href="history.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="topbar">
+        <h1>History Page</h1>
+        <button class="back-btn" onclick="goBack()">Back</button>
+      </div>
+
+      <div class="stats">
+        <div class="stat-box">
+          <span>Total Clicks</span>
+          <strong id="totalClicks">0</strong>
+        </div>
+        <div class="stat-box">
+          <span>Current Count</span>
+          <strong id="currentCount">0</strong>
+        </div>
+        <div class="stat-box">
+          <span>Active Days</span>
+          <strong id="activeDays">0</strong>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <canvas id="historyChart" width="900" height="400"></canvas>
+        <p class="note">Bar graph of total count increases by date</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="history.js"></script>
+</body>
+</html>
