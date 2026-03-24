@@ -118,10 +118,10 @@
     transition: .4s;
     width: 20px;
     border-radius: 50%;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-input:checked + .toggle-slider {
+input:checked+.toggle-slider {
     background-color: var(--brand-primary);
 }
 
@@ -136,17 +136,27 @@ input:checked + .toggle-slider {
     border-bottom: 1px solid rgba(239, 68, 68, 0.1);
 }
 
+.mobile-only-logout {
+    display: none;
+}
+
+@media (max-width: 1024px) {
+    .mobile-only-logout {
+        display: block;
+    }
+}
+
 @media (max-width: 600px) {
     .setting-item {
         flex-direction: column;
         align-items: flex-start;
         gap: 1rem;
     }
-    
-    .setting-item > div:last-child {
+
+    .setting-item>div:last-child {
         width: 100%;
     }
-    
+
     .setting-item button {
         width: 100%;
         justify-content: center;

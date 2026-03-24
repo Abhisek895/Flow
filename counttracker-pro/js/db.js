@@ -37,6 +37,10 @@ const db = {
             const store = getStore('users');
             return store.find(u => u.username === username);
         },
+        async getByEmail(email) {
+            const store = getStore('users');
+            return store.find(u => u.email === email);
+        },
         async update(id, updates) {
             const store = getStore('users');
             const idx = store.findIndex(u => u.id === id);

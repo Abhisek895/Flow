@@ -28,7 +28,7 @@
 
 .main-content {
     flex: 1;
-    margin-left: 250px;
+    margin-left: 16rem;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -173,7 +173,7 @@
 
 /* Header (Mobile & Desktop) */
 .top-header {
-    height: 70px;
+    height: 4.5rem; /* Converted to rem for scaling */
     background-color: var(--surface-color);
     border-bottom: 1px solid var(--border-color);
     display: flex;

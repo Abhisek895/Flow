@@ -24,7 +24,7 @@
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
     --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
     --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-    
+
     --radius-sm: 0.375rem;
     --radius-md: 0.5rem;
     --radius-lg: 1rem;
@@ -66,22 +66,25 @@ body {
     transition: background-color var(--transition-normal), color var(--transition-normal);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    overscroll-behavior-y: none; /* Prevents bounce scroll bug on mobile */
+    overscroll-behavior-y: none;
+    /* Prevents bounce scroll bug on mobile */
     min-height: 100%;
 }
 
 html {
     height: 100%;
-}
-
-@media (max-width: 480px) {
-    html {
-        font-size: 14px; /* Scalable trick for tiny devices to shrink all rems proportionately */
-    }
+    /* Globally shrink 1rem to 15px (instead of default 16px) to simulate zooming out on desktop for a cleaner look */
+    font-size: 15px;
+    transition: font-size var(--transition-normal);
 }
 
 /* Typography */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     font-weight: 600;
     color: var(--text-primary);
     margin-bottom: 0.5rem;
@@ -98,7 +101,10 @@ a:hover {
 }
 
 /* Forms & Inputs */
-input, button, select, textarea {
+input,
+button,
+select,
+textarea {
     font-family: inherit;
     font-size: 1rem;
     border: none;
@@ -153,7 +159,8 @@ input::placeholder {
     outline: none;
 }
 
-button:active, .btn:active {
+button:active,
+.btn:active {
     transform: scale(0.96);
 }
 
@@ -212,16 +219,42 @@ button:active, .btn:active {
 }
 
 /* Utilities */
-.text-center { text-align: center; }
-.mt-1 { margin-top: 0.25rem; }
-.mt-2 { margin-top: 0.5rem; }
-.mt-4 { margin-top: 1rem; }
-.mb-2 { margin-bottom: 0.5rem; }
-.mb-4 { margin-bottom: 1rem; }
+.text-center {
+    text-align: center;
+}
 
-.text-danger { color: var(--danger); }
-.text-primary { color: var(--brand-primary); }
-.text-secondary { color: var(--text-secondary); font-size: 0.875rem; }
+.mt-1 {
+    margin-top: 0.25rem;
+}
+
+.mt-2 {
+    margin-top: 0.5rem;
+}
+
+.mt-4 {
+    margin-top: 1rem;
+}
+
+.mb-2 {
+    margin-bottom: 0.5rem;
+}
+
+.mb-4 {
+    margin-bottom: 1rem;
+}
+
+.text-danger {
+    color: var(--danger);
+}
+
+.text-primary {
+    color: var(--brand-primary);
+}
+
+.text-secondary {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
 
 /* Loader */
 .loader-container {
@@ -230,6 +263,7 @@ button:active, .btn:active {
     justify-content: center;
     height: 100vh;
 }
+
 .spinner {
     width: 40px;
     height: 40px;
@@ -238,8 +272,11 @@ button:active, .btn:active {
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
+
 @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* Layout Container */
@@ -253,8 +290,10 @@ button:active, .btn:active {
     flex: 1;
     display: flex;
     flex-direction: column;
-    min-width: 0; /* Important for flex child truncation */
-    margin-left: 250px; /* Desktop sidebar width */
+    min-width: 0;
+    /* Important for flex child truncation */
+    margin-left: 16rem;
+    /* Converted to rem for steady scaling */
     transition: margin var(--transition-normal);
 }
 
@@ -267,7 +306,8 @@ button:active, .btn:active {
 
 /* Sidebar Skeleton - styling detailed in layout.css later, just base here */
 .sidebar {
-    width: 250px;
+    width: 16rem;
+    /* Converted to rem for steady scaling */
     height: 100%;
     position: fixed;
     top: 0;
@@ -282,19 +322,53 @@ button:active, .btn:active {
     transform: translateZ(0);
 }
 
-/* Responsive */
+/* Responsive Breakpoints */
+@media (max-width: 1200px) {
+    html {
+        font-size: 14.5px;
+    }
+
+    /* Gentle scale down for laptops */
+    .page-container {
+        padding: 1.5rem;
+    }
+}
+
 @media (max-width: 1024px) {
+    html {
+        font-size: 14px;
+    }
+
+    /* Scale down for tablets */
+    .page-container {
+        padding: 1.25rem;
+    }
+
     .main-content {
         margin-left: 0;
     }
+
     .sidebar {
         transform: translateX(-100%);
     }
+
     .sidebar.open {
         transform: translateX(0);
         box-shadow: var(--shadow-lg);
     }
+
     .menu-toggle {
         display: block;
+    }
+}
+
+@media (max-width: 768px) {
+    html {
+        font-size: 13.5px;
+    }
+
+    /* Maximum scale down for mobile bounds */
+    .page-container {
+        padding: 1rem;
     }
 }

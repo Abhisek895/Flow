@@ -198,7 +198,12 @@ const DEVOTIONAL_QUOTES = [
     "The path of devotion is the path back home."
 ];
 
-const NOTIFY_HOURS = [5, 13, 15, 17, 19]; // 5 AM, 1 PM, 3 PM, 5 PM, 7 PM
+const NOTIFY_TIMES = [
+    { h: 6, m: 0 },   // Morning 6:00 AM
+    { h: 13, m: 0 },  // Afternoon 1:00 PM
+    { h: 17, m: 30 }, // Evening 5:30 PM
+    { h: 20, m: 0 }   // Night 8:00 PM
+];
 
 let notificationInterval = null;
 
@@ -229,29 +234,35 @@ function checkAndSendNotification() {
     if (!currentUser || !currentUser.settings || !currentUser.settings.notifications) return;
 
     const now = new Date();
-    const currentMinute = now.getMinutes(); // Firing every minute for testing as requested
+    const currentHour = now.getHours();
+    const currentMinute = now.getMinutes();
     
-    const lastNotifiedMinute = parseInt(localStorage.getItem('lastNotifiedMinute'));
+    const isNotifyTime = NOTIFY_TIMES.some(t => t.h === currentHour && t.m === currentMinute);
+    
+    if (isNotifyTime) {
+        const timeStamp = `${currentHour}:${currentMinute}`;
+        const lastNotifiedTime = localStorage.getItem('lastNotifiedTime');
 
-    if (lastNotifiedMinute !== currentMinute) {
-        // Pick a random quote
-        const randomQuote = DEVOTIONAL_QUOTES[Math.floor(Math.random() * DEVOTIONAL_QUOTES.length)];
-        
-        new Notification("Devotional Reminder ✨", {
-            body: randomQuote,
-            icon: 'https://cdn-icons-png.flaticon.com/512/3592/3592868.png', // Lotus/Heart icon
-            badge: 'https://cdn-icons-png.flaticon.com/512/3592/3592868.png',
-            image: 'https://images.unsplash.com/photo-1604105828469-d65e2b0c39f0?auto=format&fit=crop&w=800&q=80', // Premium spiritual/nature image attachment
-            requireInteraction: true
-        });
+        if (lastNotifiedTime !== timeStamp) {
+            // Pick a random quote
+            const randomQuote = DEVOTIONAL_QUOTES[Math.floor(Math.random() * DEVOTIONAL_QUOTES.length)];
+            
+            new Notification("Devotional Reminder ✨", {
+                body: randomQuote,
+                icon: 'https://cdn-icons-png.flaticon.com/512/3592/3592868.png',
+                badge: 'https://cdn-icons-png.flaticon.com/512/3592/3592868.png',
+                image: 'https://images.unsplash.com/photo-1604105828469-d65e2b0c39f0?auto=format&fit=crop&w=800&q=80',
+                requireInteraction: true
+            });
 
-        // Play Peacock Sound directly since Web API Notification sound property is deprecated
-        try {
-            const peacockAudio = new Audio('https://upload.wikimedia.org/wikipedia/commons/4/44/Peacock.ogg');
-            peacockAudio.volume = 1.0;
-            peacockAudio.play().catch(e => console.warn('Browser blocked auto-play of peacock audio:', e));
-        } catch (e) {}
+            // Play Peacock Sound
+            try {
+                const peacockAudio = new Audio('https://upload.wikimedia.org/wikipedia/commons/4/44/Peacock.ogg');
+                peacockAudio.volume = 1.0;
+                peacockAudio.play().catch(e => console.warn('Browser blocked auto-play of peacock audio:', e));
+            } catch (e) {}
 
-        localStorage.setItem('lastNotifiedMinute', currentMinute.toString());
+            localStorage.setItem('lastNotifiedTime', timeStamp);
+        }
     }
 }

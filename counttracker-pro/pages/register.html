@@ -23,18 +23,25 @@
             }
 
             const form = document.getElementById('register-form');
+            const otpSection = document.getElementById('otp-section');
+            const mainFields = document.getElementById('main-fields');
             const errorElement = document.getElementById('error-msg');
             const btn = document.getElementById('submit-btn');
+            const verifyBtn = document.getElementById('verify-btn');
+            const otpInput = document.getElementById('otp');
+
+            let registrationData = null;
 
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 errorElement.textContent = '';
                 
                 const username = form.username.value.trim();
+                const email = form.email.value.trim();
                 const password = form.password.value;
                 const confirmPassword = form.confirmPassword.value;
 
-                if (!username || !password || !confirmPassword) {
+                if (!username || !email || !password || !confirmPassword) {
                     errorElement.textContent = 'Please fill in all fields.';
                     return;
                 }
@@ -50,19 +57,64 @@
                 }
 
                 btn.disabled = true;
-                btn.innerHTML = '<i class="ph ph-spinner-gap ph-spin"></i> Creating...';
+                btn.innerHTML = '<i class="ph ph-spinner-gap ph-spin"></i> Sending OTP...';
 
                 try {
-                    await register(username, password);
-                    showToast('Registration successful! Please login.');
+                    // Check if user exists first to avoid sending OTP for existing accounts
+                    const existingUser = await db.users.getByUsername(username);
+                    if (existingUser) throw new Error('Username already taken.');
+                    const existingEmail = await db.users.getByEmail(email);
+                    if (existingEmail) throw new Error('Email already registered.');
+
+                    await sendOTP(email, 'register');
+                    
+                    registrationData = { username, email, password };
+                    
+                    // Show OTP section
+                    mainFields.style.display = 'none';
+                    otpSection.style.display = 'block';
+                    btn.style.display = 'none';
+                    showToast('OTP sent to your email!');
+                } catch (err) {
+        if (err.message === 'Failed to fetch') {
+            errorElement.textContent = 'Backend server is not running. Please start the server at counttracker-pro/server';
+        } else {
+            errorElement.textContent = err.message || 'Failed to send OTP.';
+        }
+        btn.disabled = false;
+        btn.innerHTML = 'Create Account';
+    }
+            });
+
+            verifyBtn.addEventListener('click', async () => {
+                const otp = otpInput.value.trim();
+                if (!otp) {
+                    errorElement.textContent = 'Please enter the OTP.';
+                    return;
+                }
+
+                verifyBtn.disabled = true;
+                verifyBtn.innerHTML = '<i class="ph ph-spinner-gap ph-spin"></i> Verifying...';
+
+                try {
+                    await verifyOTP(registrationData.email, otp);
+                    
+                    // Proceed with registration
+                    await register(registrationData.username, registrationData.email, registrationData.password);
+                    
+                    showToast('Registration successful! Redirecting...');
                     setTimeout(() => {
                         window.location.href = 'login.html';
                     }, 1000);
                 } catch (err) {
-                    errorElement.textContent = err.message || 'Registration failed.';
-                    btn.disabled = false;
-                    btn.innerHTML = 'Create Account';
-                }
+        if (err.message === 'Failed to fetch') {
+            errorElement.textContent = 'Backend server is not running. Please start the server at counttracker-pro/server';
+        } else {
+            errorElement.textContent = err.message || 'OTP verification failed.';
+        }
+        verifyBtn.disabled = false;
+        verifyBtn.innerHTML = 'Verify & Register';
+    }
             });
         });
     </script>
@@ -81,18 +133,37 @@
             <div id="error-msg" class="error-msg"></div>
 
             <form id="register-form" class="auth-form">
-                <div class="input-group">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" name="username" placeholder="Choose a username" autocomplete="username">
+                <div id="main-fields">
+                    <div class="input-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" placeholder="Choose a username" autocomplete="username">
+                    </div>
+                    <div class="input-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" placeholder="Enter your email" autocomplete="email">
+                    </div>
+                    <div class="input-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" placeholder="Create a password" autocomplete="new-password">
+                    </div>
+                    <div class="input-group">
+                        <label for="confirmPassword">Confirm Password</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" autocomplete="new-password">
+                    </div>
                 </div>
-                <div class="input-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" placeholder="Create a password" autocomplete="new-password">
+
+                <div id="otp-section" style="display: none;">
+                    <p class="text-secondary mb-4">An OTP has been sent to your email. Please enter it below to verify your account.</p>
+                    <div class="input-group">
+                        <label for="otp">Enter OTP</label>
+                        <input type="text" id="otp" name="otp" placeholder="6-digit code" maxlength="6" style="text-align: center; font-size: 1.5rem; letter-spacing: 5px;">
+                    </div>
+                    <button type="button" id="verify-btn" class="btn btn-primary w-full">Verify & Register</button>
+                    <p class="text-center mt-4">
+                        <a href="#" onclick="location.reload()">Back to Details</a>
+                    </p>
                 </div>
-                <div class="input-group">
-                    <label for="confirmPassword">Confirm Password</label>
-                    <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" autocomplete="new-password">
-                </div>
+
                 <button type="submit" id="submit-btn" class="btn btn-primary">Create Account</button>
             </form>
 

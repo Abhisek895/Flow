@@ -29,7 +29,8 @@
 
 @media (max-width: 768px) {
     .toast-container {
-        bottom: 5rem; /* Above bottom nav */
+        bottom: 5rem;
+        /* Above bottom nav */
         right: 1rem;
         left: 1rem;
     }

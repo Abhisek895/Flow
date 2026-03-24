@@ -4,79 +4,126 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Analytics - CountTracker Pro</title>
-    <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link rel="stylesheet" href="../css/base.css">
     <link rel="stylesheet" href="../css/layout.css">
     <link rel="stylesheet" href="../css/components.css">
     <link rel="stylesheet" href="../css/analytics.css">
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        #temp-content { display: none; }
-    </style>
+    <style>#temp-content { display: none; }</style>
 </head>
 <body>
     <div id="app-layout">
-        <div class="loader-container">
-            <div class="spinner"></div>
-        </div>
+        <div class="loader-container"><div class="spinner"></div></div>
     </div>
 
     <div id="temp-content">
-        <div class="dashboard-section">
-            <h2 style="margin-bottom: 1.5rem;"><i class="ph ph-chart-bar text-primary"></i> Analytics Overview</h2>
-            
-            <div class="analytics-cards">
-                <div class="mini-stat-card streak-card">
-                    <div class="mini-stat-title"><i class="ph ph-fire"></i> Current Streak</div>
-                    <div class="mini-stat-value" id="stat-streak">0 Days</div>
+        <div class="anx-page">
+
+            <!-- Page Title -->
+            <div class="anx-title-row">
+                <h2 class="anx-title"><i class="ph ph-chart-bar"></i> Analytics</h2>
+            </div>
+
+            <!-- ── Stat Cards ─────────────────────────── -->
+            <div class="anx-stats">
+                <div class="anx-stat anx-stat--hot">
+                    <i class="ph ph-fire anx-stat__icon"></i>
+                    <div class="anx-stat__body">
+                        <span class="anx-stat__lbl">Streak</span>
+                        <span class="anx-stat__val" id="stat-streak">0 Days</span>
+                    </div>
                 </div>
-                <div class="mini-stat-card">
-                    <div class="mini-stat-title">Weekly Average</div>
-                    <div class="mini-stat-value" id="stat-weekly-avg">0/day</div>
+                <div class="anx-stat">
+                    <i class="ph ph-calendar-check anx-stat__icon"></i>
+                    <div class="anx-stat__body">
+                        <span class="anx-stat__lbl">Weekly Avg</span>
+                        <span class="anx-stat__val" id="stat-weekly-avg">0/day</span>
+                    </div>
                 </div>
-                <div class="mini-stat-card">
-                    <div class="mini-stat-title">Monthly Total</div>
-                    <div class="mini-stat-value" id="stat-monthly-total">0</div>
+                <div class="anx-stat">
+                    <i class="ph ph-trend-up anx-stat__icon"></i>
+                    <div class="anx-stat__body">
+                        <span class="anx-stat__lbl">Monthly</span>
+                        <span class="anx-stat__val" id="stat-monthly-total">0</span>
+                    </div>
+                </div>
+                <div class="anx-stat">
+                    <i class="ph ph-timer anx-stat__icon"></i>
+                    <div class="anx-stat__body">
+                        <span class="anx-stat__lbl">Avg Session</span>
+                        <span class="anx-stat__val" id="stat-avg-duration">0m</span>
+                    </div>
+                </div>
+                <div class="anx-stat">
+                    <i class="ph ph-star anx-stat__icon"></i>
+                    <div class="anx-stat__body">
+                        <span class="anx-stat__lbl">Best Day</span>
+                        <span class="anx-stat__val" id="stat-best-day">0</span>
+                    </div>
+                </div>
+                <!-- NEW: Best Hour stat -->
+                <div class="anx-stat">
+                    <i class="ph ph-clock-afternoon anx-stat__icon"></i>
+                    <div class="anx-stat__body">
+                        <span class="anx-stat__lbl">Peak Hour</span>
+                        <span class="anx-stat__val" id="stat-peak-hour">—</span>
+                    </div>
                 </div>
             </div>
 
-            <!-- Second Row of Stats -->
-            <div class="analytics-cards" style="margin-bottom: 1.5rem;">
-                <div class="mini-stat-card">
-                    <div class="mini-stat-title">Avg Session Length</div>
-                    <div class="mini-stat-value" id="stat-avg-duration">0m 0s</div>
+            <!-- ── Activity Chart with Date Range Tabs ── -->
+            <div class="anx-card anx-card--blue">
+                <div class="anx-card__head">
+                    <span class="anx-card__dot anx-card__dot--blue"></span>
+                    <span>Activity Over Time</span>
+                    <!-- NEW: Range Tabs -->
+                    <div class="anx-range-tabs">
+                        <button class="anx-tab" data-days="7">7D</button>
+                        <button class="anx-tab anx-tab--active" data-days="30">30D</button>
+                        <button class="anx-tab" data-days="90">90D</button>
+                    </div>
                 </div>
-                <div class="mini-stat-card">
-                    <div class="mini-stat-title">Best Day Ever</div>
-                    <div class="mini-stat-value" id="stat-best-day">0</div>
-                </div>
-            </div>
-
-            <div class="chart-wrapper">
-                <h3 class="chart-title"><i class="ph ph-calendar-blank"></i> Activity Over the Last 30 Days</h3>
-                <div style="position: relative; height: 250px; width: 100%; max-height: 40vh;">
+                <div class="anx-card__body">
                     <canvas id="monthlyChart"></canvas>
                 </div>
             </div>
 
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem;">
-                <div class="chart-wrapper">
-                    <h3 class="chart-title"><i class="ph ph-clock"></i> Sessions Breakdown</h3>
-                    <div style="position: relative; height: 220px; width: 100%; display: flex; justify-content: center;">
+            <!-- ── Bottom Row: Pie + Day-of-Week ─────── -->
+            <div class="anx-bottom-row">
+
+                <div class="anx-card anx-card--purple">
+                    <div class="anx-card__head">
+                        <span class="anx-card__dot anx-card__dot--purple"></span>
+                        <span>Sessions Breakdown</span>
+                    </div>
+                    <div class="anx-card__body">
                         <canvas id="durationChart"></canvas>
                     </div>
                 </div>
-                
-                <div class="chart-wrapper">
-                    <h3 class="chart-title"><i class="ph ph-trophy"></i> Top Sessions</h3>
-                    <div id="top-sessions-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
-                        <!-- List -->
+
+                <!-- NEW: Day of Week chart -->
+                <div class="anx-card anx-card--teal">
+                    <div class="anx-card__head">
+                        <span class="anx-card__dot anx-card__dot--teal"></span>
+                        <span>Most Active Days</span>
+                    </div>
+                    <div class="anx-card__body">
+                        <canvas id="weekdayChart"></canvas>
                     </div>
                 </div>
+
             </div>
-            
+
+            <!-- ── Top Sessions ───────────────────────── -->
+            <div class="anx-card anx-card--green">
+                <div class="anx-card__head">
+                    <span class="anx-card__dot anx-card__dot--green"></span>
+                    <span>Top Sessions</span>
+                </div>
+                <div class="anx-card__body anx-card__body--list" id="top-sessions-list"></div>
+            </div>
+
         </div>
     </div>
 

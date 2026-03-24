@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,9 +12,12 @@
     <link rel="stylesheet" href="../css/components.css">
     <link rel="stylesheet" href="../css/profile.css">
     <style>
-        #temp-content { display: none; }
+        #temp-content {
+            display: none;
+        }
     </style>
 </head>
+
 <body>
     <div id="app-layout">
         <div class="loader-container">
@@ -37,6 +41,18 @@
                 <div class="settings-group-header">
                     <i class="ph ph-gear"></i> Application Settings
                 </div>
+                <!-- Edit Profile -->
+                <div class="setting-item" id="edit-profile-item">
+                    <div class="setting-info">
+                        <h4>Edit Profile</h4>
+                        <p id="profile-details-summary">Update your username and account email.</p>
+                    </div>
+                    <div>
+                        <button class="btn btn-secondary" id="btn-edit-profile">
+                            <i class="ph ph-user-focus"></i> Edit Details
+                        </button>
+                    </div>
+                </div>
                 <div class="setting-item">
                     <div class="setting-info">
                         <h4>Dark Theme</h4>
@@ -51,7 +67,8 @@
                 <div class="setting-item">
                     <div class="setting-info">
                         <h4>Daily Devotionals</h4>
-                        <p>Receive push notifications 5 times a day (5 AM, 1 PM, 3 PM, 5 PM, 7 PM) with inspiring quotes. <br><small class="text-secondary">(App tab must be open)</small></p>
+                        <p>Receive push notifications 4 times a day (6:00 AM, 1:00 PM, 5:30 PM, 8:00 PM) with inspiring
+                            quotes. <br><small class="text-secondary">(App tab must be open)</small></p>
                     </div>
                     <label class="toggle-switch">
                         <input type="checkbox" id="notifications-toggle">
@@ -90,15 +107,35 @@
                 </div>
             </div>
 
+            <!-- Logout Section (Visible on Mobile) -->
+            <div class="settings-group mobile-only-logout">
+                <div class="settings-group-header">
+                    <i class="ph ph-sign-out"></i> Account Session
+                </div>
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <h4>Sign Out</h4>
+                        <p>Log out of your account on this device.</p>
+                    </div>
+                    <div>
+                        <button class="btn btn-secondary" id="btn-logout-profile">
+                            <i class="ph ph-sign-out"></i> Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <!-- Danger Zone -->
             <div class="settings-group danger-zone-card">
                 <div class="settings-group-header danger-zone-header">
                     <i class="ph ph-warning-octagon"></i> Danger Zone
                 </div>
+                <!-- ... entries ... -->
                 <div class="setting-item">
                     <div class="setting-info">
                         <h4>Reset Active Counter</h4>
-                        <p>Reset the current active counter securely, without keeping history of this active session.</p>
+                        <p>Reset the current active counter securely, without keeping history of this active session.
+                        </p>
                     </div>
                     <div>
                         <button class="btn btn-warning-outline" id="btn-soft-reset">
@@ -140,4 +177,5 @@
     <script src="../js/app.js"></script>
     <script src="../js/profile.js"></script>
 </body>
+
 </html>
