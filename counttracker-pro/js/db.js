@@ -1,5 +1,5 @@
 /**
- * db.js - LocalStorage "Data Structure" wrapper for CountTracker Pro
+ * db.js - LocalStorage "Data Structure" wrapper for Flow
  * Replaces IndexedDB to act as an in-memory/localStorage mock database.
  */
 

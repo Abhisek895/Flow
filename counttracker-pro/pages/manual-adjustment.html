@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual Count Adjustment - CountTracker Pro</title>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/counter.css">
+    <style>
+        .adjustment-page-container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 3rem 1.5rem;
+            min-height: 100vh;
+        }
+
+        .adjustment-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeInDown 0.5s ease;
+        }
+
+        .adjustment-header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+            background: linear-gradient(135deg, var(--brand-primary), #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            letter-spacing: -1px;
+        }
+
+        .adjustment-header h1 i {
+            font-size: 2.8rem;
+            background: linear-gradient(135deg, var(--brand-primary), #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .adjustment-header p {
+            color: var(--text-secondary);
+            font-size: 1.15rem;
+            font-weight: 500;
+            line-height: 1.6;
+        }
+
+        .adjustment-card {
+            background: linear-gradient(135deg, var(--surface-color) 0%, rgba(79, 70, 229, 0.02) 100%);
+            border: 2px solid var(--border-color);
+            border-radius: 24px;
+            padding: 2.8rem;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1), 0 0 1px rgba(79, 70, 229, 0.3);
+            backdrop-filter: blur(10px);
+            animation: fadeInUp 0.6s ease 0.1s both;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .adjustment-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(79, 70, 229, 0.05), transparent);
+            pointer-events: none;
+        }
+
+        .adjustment-form {
+            display: flex;
+            flex-direction: column;
+            gap: 2.2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .form-group label {
+            font-weight: 800;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-group label i {
+            font-size: 1.3rem;
+            color: var(--brand-primary);
+        }
+
+        .form-group input[type="date"] {
+            padding: 1.2rem;
+            border: 2px solid var(--border-color);
+            border-radius: 14px;
+            background: var(--surface-hover);
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            font-family: inherit;
+            font-weight: 700;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            cursor: pointer;
+        }
+
+        .form-group input[type="date"]:hover {
+            border-color: var(--brand-primary);
+            background: var(--surface-color);
+            transform: translateY(-2px);
+        }
+
+        .form-group input[type="date"]:focus {
+            outline: none;
+            border-color: var(--brand-primary);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.18);
+            background: var(--surface-color);
+            transform: translateY(-2px);
+        }
+
+        .adjustment-display {
+            text-align: center;
+            padding: 3rem 2.5rem;
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.12) 0%, rgba(139, 92, 246, 0.08) 100%);
+            border: 2.5px solid var(--brand-primary);
+            border-radius: 20px;
+            margin: 0.5rem 0;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(79, 70, 229, 0.15);
+        }
+
+        .adjustment-display::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .adjustment-display:hover::before {
+            left: 100%;
+        }
+
+        .adjustment-display p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 800;
+        }
+
+        .adjustment-value {
+            font-size: 4.5rem;
+            font-weight: 950;
+            background: linear-gradient(135deg, var(--brand-primary) 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-family: 'Courier New', monospace;
+            margin: 0.5rem 0 1rem;
+            letter-spacing: 3px;
+            animation: scaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .adjustment-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.08) 0%, rgba(139, 92, 246, 0.05) 100%);
+            padding: 2.2rem;
+            border-radius: 18px;
+            border: 2px solid var(--border-color);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .adjustment-controls:hover {
+            border-color: var(--brand-primary);
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.12) 0%, rgba(139, 92, 246, 0.08) 100%);
+            box-shadow: 0 10px 30px rgba(79, 70, 229, 0.15);
+            transform: translateY(-3px);
+        }
+
+        .btn-adjustment {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            border: 2.5px solid;
+            background: var(--surface-color);
+            color: var(--text-primary);
+            font-size: 2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            font-weight: 800;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+            flex-shrink: 0;
+        }
+
+        .btn-minus {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.18) 0%, rgba(239, 68, 68, 0.1) 100%);
+            color: var(--danger);
+            border-color: var(--danger);
+        }
+
+        .btn-minus:hover {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.3) 0%, rgba(239, 68, 68, 0.2) 100%);
+            transform: scale(1.15) rotate(-8deg);
+            box-shadow: 0 12px 28px rgba(239, 68, 68, 0.35);
+            border-color: var(--danger);
+        }
+
+        .btn-minus:active {
+            transform: scale(0.93);
+        }
+
+        .btn-plus {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.18) 0%, rgba(34, 197, 94, 0.1) 100%);
+            color: var(--success);
+            border-color: var(--success);
+        }
+
+        .btn-plus:hover {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.3) 0%, rgba(34, 197, 94, 0.2) 100%);
+            transform: scale(1.15) rotate(8deg);
+            box-shadow: 0 12px 28px rgba(34, 197, 94, 0.35);
+            border-color: var(--success);
+        }
+
+        .btn-plus:active {
+            transform: scale(0.93);
+        }
+
+        .adjustment-input {
+            width: 150px;
+            height: 65px;
+            font-size: 2rem;
+            font-weight: 950;
+            text-align: center;
+            border: 2.5px solid var(--brand-primary);
+            border-radius: 14px;
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.08) 0%, rgba(79, 70, 229, 0.04) 100%);
+            color: var(--brand-primary);
+            padding: 0;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            font-family: 'Courier New', monospace;
+            letter-spacing: 2px;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.12);
+        }
+
+        .adjustment-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.25);
+            border-color: var(--brand-primary);
+            background: var(--surface-color);
+            transform: scale(1.05);
+        }
+
+        .adjustment-input:hover {
+            border-color: var(--brand-primary);
+            background: var(--surface-hover);
+        }
+
+        .btn-apply {
+            width: 100%;
+            padding: 1.35rem;
+            font-size: 1.15rem;
+            font-weight: 800;
+            border-radius: 14px;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            box-shadow: 0 8px 24px rgba(79, 70, 229, 0.3);
+            border: 2px solid transparent;
+        }
+
+        .btn-apply:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 14px 40px rgba(79, 70, 229, 0.4);
+        }
+
+        .btn-apply:active {
+            transform: translateY(-1px);
+        }
+
+        .adjustment-result {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            border-radius: 14px;
+            border: 2.5px solid;
+            display: none;
+            align-items: center;
+            gap: 1.2rem;
+            font-weight: 800;
+            animation: slideInUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            font-size: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .adjustment-result::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 5px;
+            height: 100%;
+            border-radius: 2px;
+        }
+
+        .adjustment-result.success {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(34, 197, 94, 0.08) 100%);
+            border-color: var(--success);
+            color: var(--success);
+            box-shadow: 0 6px 18px rgba(34, 197, 94, 0.2);
+        }
+
+        .adjustment-result.success::before {
+            background: var(--success);
+        }
+
+        .adjustment-result.error {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.08) 100%);
+            border-color: var(--danger);
+            color: var(--danger);
+            box-shadow: 0 6px 18px rgba(239, 68, 68, 0.2);
+        }
+
+        .adjustment-result.error::before {
+            background: var(--danger);
+        }
+
+        .adjustment-result i {
+            font-size: 1.8rem;
+            flex-shrink: 0;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0.7);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.12) 0%, rgba(59, 130, 246, 0.06) 100%);
+            border-left: 5px solid var(--brand-primary);
+            padding: 1.5rem;
+            border-radius: 14px;
+            margin-bottom: 3rem;
+            display: flex;
+            gap: 1.2rem;
+            animation: fadeInDown 0.5s ease 0.05s both;
+            border: 2px solid rgba(59, 130, 246, 0.25);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+        }
+
+        .info-box i {
+            font-size: 1.5rem;
+            color: var(--brand-primary);
+            flex-shrink: 0;
+            margin-top: 3px;
+        }
+
+        .info-box p {
+            margin: 0;
+            font-size: 1rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            line-height: 1.6;
+        }
+
+        .date-display {
+            font-size: 0.9rem;
+            color: var(--brand-primary);
+            margin-top: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        @media (max-width: 600px) {
+            .adjustment-page-container {
+                padding: 2rem 1rem;
+            }
+
+            .adjustment-card {
+                padding: 2rem;
+                border-radius: 18px;
+            }
+
+            .adjustment-header h1 {
+                font-size: 2rem;
+            }
+
+            .adjustment-header p {
+                font-size: 1rem;
+            }
+
+            .adjustment-value {
+                font-size: 3.2rem;
+            }
+
+            .adjustment-display {
+                padding: 2rem 1.5rem;
+            }
+
+            .adjustment-controls {
+                gap: 0.8rem;
+                padding: 1.5rem;
+            }
+
+            .btn-adjustment {
+                width: 55px;
+                height: 55px;
+                font-size: 1.5rem;
+            }
+
+            .adjustment-input {
+                width: 120px;
+                height: 55px;
+                font-size: 1.5rem;
+            }
+
+            .adjustment-form {
+                gap: 1.8rem;
+            }
+
+            .btn-apply {
+                padding: 1.1rem;
+                font-size: 1rem;
+            }
+
+            .info-box {
+                padding: 1.2rem;
+            }
+
+            .form-group label {
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Tablets and Medium Devices */
+        @media (max-width: 900px) and (min-width: 601px) {
+            .adjustment-page-container {
+                padding: 2.5rem 1.5rem;
+            }
+
+            .adjustment-card {
+                padding: 2.2rem;
+            }
+
+            .adjustment-header h1 {
+                font-size: 2.4rem;
+            }
+
+            .adjustment-value {
+                font-size: 3.8rem;
+            }
+
+            .btn-adjustment {
+                width: 60px;
+                height: 60px;
+                font-size: 1.7rem;
+            }
+
+            .adjustment-input {
+                width: 135px;
+                height: 60px;
+                font-size: 1.7rem;
+            }
+        }
+
+        /* Small Phones (Portrait) */
+        @media (max-width: 400px) {
+            .adjustment-page-container {
+                padding: 1.5rem 0.75rem;
+            }
+
+            .adjustment-card {
+                padding: 1.5rem;
+                border-radius: 16px;
+                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            }
+
+            .adjustment-header {
+                margin-bottom: 2rem;
+            }
+
+            .adjustment-header h1 {
+                font-size: 1.6rem;
+                gap: 0.5rem;
+            }
+
+            .adjustment-header h1 i {
+                font-size: 1.6rem;
+            }
+
+            .adjustment-header p {
+                font-size: 0.9rem;
+            }
+
+            .info-box {
+                padding: 1rem;
+                margin-bottom: 1.5rem;
+                gap: 0.75rem;
+            }
+
+            .info-box i {
+                font-size: 1.2rem;
+            }
+
+            .info-box p {
+                font-size: 0.85rem;
+            }
+
+            .adjustment-form {
+                gap: 1.3rem;
+            }
+
+            .form-group {
+                gap: 0.7rem;
+            }
+
+            .form-group label {
+                font-size: 0.8rem;
+                letter-spacing: 0.5px;
+            }
+
+            .form-group label i {
+                font-size: 1.1rem;
+            }
+
+            .form-group input[type="date"] {
+                padding: 0.9rem;
+                font-size: 1rem;
+            }
+
+            .date-display {
+                font-size: 0.8rem;
+                margin-top: 0.5rem;
+            }
+
+            .adjustment-display {
+                padding: 1.5rem 1rem;
+                border-radius: 14px;
+                margin: 0.5rem 0;
+            }
+
+            .adjustment-display p {
+                font-size: 0.85rem;
+                margin-bottom: 0.75rem;
+            }
+
+            .adjustment-value {
+                font-size: 2.8rem;
+                margin: 0.25rem 0 0.75rem;
+            }
+
+            .adjustment-controls {
+                gap: 0.6rem;
+                padding: 1.2rem;
+                border-radius: 12px;
+            }
+
+            .btn-adjustment {
+                width: 48px;
+                height: 48px;
+                font-size: 1.3rem;
+                border: 2px solid;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            }
+
+            .btn-minus:hover {
+                transform: scale(1.1) rotate(-8deg);
+            }
+
+            .btn-plus:hover {
+                transform: scale(1.1) rotate(8deg);
+            }
+
+            .adjustment-input {
+                width: 100px;
+                height: 48px;
+                font-size: 1.3rem;
+                border: 2px solid var(--brand-primary);
+            }
+
+            .btn-apply {
+                padding: 0.95rem;
+                font-size: 0.95rem;
+                gap: 0.6rem;
+                letter-spacing: 0.3px;
+            }
+
+            .adjustment-result {
+                margin-top: 1rem;
+                padding: 1.2rem;
+                border-radius: 10px;
+                gap: 0.8rem;
+                font-size: 0.9rem;
+            }
+
+            .adjustment-result i {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Extra Small Phones (Below 360px) */
+        @media (max-width: 360px) {
+            .adjustment-page-container {
+                padding: 1.2rem 0.5rem;
+                min-height: 100vh;
+            }
+
+            .adjustment-card {
+                padding: 1.2rem;
+                border-radius: 12px;
+            }
+
+            .adjustment-header h1 {
+                font-size: 1.4rem;
+            }
+
+            .adjustment-header p {
+                font-size: 0.85rem;
+            }
+
+            .info-box {
+                padding: 0.9rem;
+                gap: 0.6rem;
+            }
+
+            .info-box i {
+                font-size: 1.1rem;
+            }
+
+            .info-box p {
+                font-size: 0.8rem;
+                line-height: 1.4;
+            }
+
+            .adjustment-form {
+                gap: 1.2rem;
+            }
+
+            .form-group label {
+                font-size: 0.75rem;
+            }
+
+            .adjustment-display {
+                padding: 1.3rem 0.9rem;
+            }
+
+            .adjustment-value {
+                font-size: 2.5rem;
+                letter-spacing: 2px;
+            }
+
+            .adjustment-controls {
+                gap: 0.5rem;
+                padding: 1rem;
+            }
+
+            .btn-adjustment {
+                width: 44px;
+                height: 44px;
+                font-size: 1.1rem;
+            }
+
+            .adjustment-input {
+                width: 90px;
+                height: 44px;
+                font-size: 1.1rem;
+            }
+
+            .btn-apply {
+                padding: 0.85rem;
+                font-size: 0.85rem;
+            }
+        }
+
+        /* Landscape Mode */
+        @media (max-height: 600px) and (orientation: landscape) {
+            .adjustment-page-container {
+                padding: 1.5rem 1rem;
+                min-height: auto;
+            }
+
+            .adjustment-card {
+                padding: 1.5rem;
+            }
+
+            .adjustment-header {
+                margin-bottom: 1.5rem;
+            }
+
+            .adjustment-header h1 {
+                font-size: 1.8rem;
+                margin-bottom: 0.3rem;
+            }
+
+            .adjustment-header p {
+                font-size: 0.9rem;
+            }
+
+            .info-box {
+                margin-bottom: 1.5rem;
+                padding: 1rem;
+            }
+
+            .adjustment-form {
+                gap: 1.2rem;
+            }
+
+            .adjustment-display {
+                padding: 1.5rem 1.2rem;
+            }
+
+            .adjustment-value {
+                font-size: 2.8rem;
+            }
+
+            .adjustment-controls {
+                padding: 1.2rem;
+            }
+
+            .btn-adjustment {
+                width: 50px;
+                height: 50px;
+            }
+
+            .adjustment-input {
+                width: 110px;
+                height: 50px;
+            }
+        }
+
+        /* Ultra-wide screens */
+        @media (min-width: 1440px) {
+            .adjustment-page-container {
+                padding: 4rem 2rem;
+            }
+
+            .adjustment-card {
+                padding: 3.5rem;
+                max-width: 900px;
+                margin: 0 auto;
+            }
+
+            .adjustment-header h1 {
+                font-size: 3.2rem;
+            }
+
+            .adjustment-value {
+                font-size: 5rem;
+            }
+
+            .btn-adjustment {
+                width: 75px;
+                height: 75px;
+                font-size: 2.2rem;
+            }
+
+            .adjustment-input {
+                width: 180px;
+                height: 75px;
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app-layout">
+        <div class="loader-container">
+            <div class="spinner"></div>
+        </div>
+    </div>
+
+    <div id="temp-content">
+        <div class="adjustment-page-container">
+            <!-- Header -->
+            <div class="adjustment-header">
+                <h1>
+                    <i class="ph ph-calculator"></i> Manual Count Adjustment
+                </h1>
+                <p>Adjust your daily count for any specific day</p>
+            </div>
+
+            <!-- Info Box -->
+            <div class="info-box">
+                <i class="ph ph-info" style="flex-shrink: 0; font-size: 1.2rem;"></i>
+                <p>Select a date and enter the adjustment amount. You can add or subtract counts from any day's session.</p>
+            </div>
+
+            <!-- Adjustment Card -->
+            <div class="adjustment-card">
+                <form class="adjustment-form" id="adjustment-form">
+                    <!-- Date Selection -->
+                    <div class="form-group">
+                        <label for="adjustment-date">
+                            <i class="ph ph-calendar"></i> Select Date
+                        </label>
+                        <input type="date" id="adjustment-date" required>
+                        <div class="date-display" id="date-display"></div>
+                    </div>
+
+                    <!-- Adjustment Display -->
+                    <div class="adjustment-display">
+                        <p>Adjustment Amount</p>
+                        <div class="adjustment-value" id="adjustment-display">1</div>
+                    </div>
+
+                    <!-- Controls -->
+                    <div class="form-group">
+                        <label>
+                            <i class="ph ph-minus-plus"></i> Adjust Amount
+                        </label>
+                        <div class="adjustment-controls">
+                            <button type="button" class="btn-adjustment btn-minus" id="btn-minus">
+                                <i class="ph ph-minus-bold"></i>
+                            </button>
+                            <input type="number" id="adjustment-amount" class="adjustment-input" value="1" min="1" max="9999">
+                            <button type="button" class="btn-adjustment btn-plus" id="btn-plus">
+                                <i class="ph ph-plus-bold"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Result Message -->
+                    <div id="adjustment-result" class="adjustment-result">
+                        <i class="ph ph-check-circle"></i>
+                        <span id="result-text"></span>
+                    </div>
+
+                    <!-- Apply Button -->
+                    <button type="button" id="btn-apply-adjustment" class="btn btn-primary btn-apply">
+                        <i class="ph ph-check-circle"></i> Apply Adjustment
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/utils.js"></script>
+    <script src="../js/db.js"></script>
+    <script src="../js/ui.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            await initApp('manual-adjustment');
+            if (!currentUser) return;
+
+            const dateInput = document.getElementById('adjustment-date');
+            const amountInput = document.getElementById('adjustment-amount');
+            const displayValue = document.getElementById('adjustment-display');
+            const dateDisplay = document.getElementById('date-display');
+            const btnMinus = document.getElementById('btn-minus');
+            const btnPlus = document.getElementById('btn-plus');
+            const btnApply = document.getElementById('btn-apply-adjustment');
+            const resultDiv = document.getElementById('adjustment-result');
+            const resultText = document.getElementById('result-text');
+
+            // Set today's date as default
+            const today = new Date().toISOString().split('T')[0];
+            dateInput.value = today;
+            updateDateDisplay();
+
+            // Update display when date changes
+            dateInput.addEventListener('change', updateDateDisplay);
+
+            function updateDateDisplay() {
+                const selectedDate = new Date(dateInput.value);
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                dateDisplay.textContent = selectedDate.toLocaleDateString('en-US', options);
+            }
+
+            // Update display value
+            amountInput.addEventListener('input', () => {
+                displayValue.textContent = amountInput.value || '0';
+            });
+
+            // Minus button - decrease amount
+            btnMinus.addEventListener('click', (e) => {
+                e.preventDefault();
+                const current = parseInt(amountInput.value) || 1;
+                if (current > 1) {
+                    amountInput.value = current - 1;
+                    displayValue.textContent = amountInput.value;
+                }
+            });
+
+            // Plus button - increase amount
+            btnPlus.addEventListener('click', (e) => {
+                e.preventDefault();
+                const current = parseInt(amountInput.value) || 1;
+                amountInput.value = current + 1;
+                displayValue.textContent = amountInput.value;
+            });
+
+            // Apply adjustment
+            btnApply.addEventListener('click', async (e) => {
+                e.preventDefault();
+
+                const selectedDate = dateInput.value;
+                const adjustmentAmount = parseInt(amountInput.value) || 1;
+
+                if (!selectedDate) {
+                    showToast('Please select a date', 'error');
+                    return;
+                }
+
+                try {
+                    btnApply.disabled = true;
+                    btnApply.innerHTML = '<i class="ph ph-spinner-gap ph-spin"></i> Applying...';
+
+                    // Get all user sessions
+                    const allSessions = await db.sessions.getByUser(currentUser.id);
+
+                    // Find session matching this date
+                    const sessionDate = new Date(selectedDate).toISOString().split('T')[0];
+                    let targetSession = allSessions.find(s => {
+                        const sDate = new Date(s.startedAt).toISOString().split('T')[0];
+                        return sDate === sessionDate;
+                    });
+
+                    if (!targetSession) {
+                        showToast('No session found for this date. Create one first on Counter page.', 'error');
+                        btnApply.disabled = false;
+                        btnApply.innerHTML = '<i class="ph ph-check-circle"></i> Apply Adjustment';
+                        return;
+                    }
+
+                    // Update the session
+                    const oldCount = targetSession.endCount || 0;
+                    const newCount = oldCount + adjustmentAmount;
+
+                    targetSession.endCount = newCount;
+                    targetSession.totalIncrements = newCount;
+                    await db.sessions.put(targetSession);
+
+                    // Show success result
+                    resultDiv.classList.remove('error');
+                    resultDiv.classList.add('success');
+                    resultText.innerHTML = `Count updated from <strong>${oldCount}</strong> to <strong>${newCount}</strong>`;
+                    resultDiv.style.display = 'flex';
+
+                    showToast('Count adjusted successfully!', 'success');
+
+                    // Reset form after 3 seconds
+                    setTimeout(() => {
+                        amountInput.value = '1';
+                        displayValue.textContent = '1';
+                        dateInput.value = today;
+                        updateDateDisplay();
+                        resultDiv.style.display = 'none';
+                        btnApply.disabled = false;
+                        btnApply.innerHTML = '<i class="ph ph-check-circle"></i> Apply Adjustment';
+                    }, 3000);
+
+                } catch (err) {
+                    console.error('Adjustment error:', err);
+                    resultDiv.classList.remove('success');
+                    resultDiv.classList.add('error');
+                    resultText.innerHTML = `<i class="ph ph-warning-circle"></i> Error: ${err.message}`;
+                    resultDiv.style.display = 'flex';
+                    
+                    btnApply.disabled = false;
+                    btnApply.innerHTML = '<i class="ph ph-check-circle"></i> Apply Adjustment';
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,4 +1,8 @@
-require('dotenv').config();
+const path = require('path');
+// Load .env from server/ or project root
+require('dotenv').config({ path: path.join(__dirname, '.env') });
+require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
+
 const express = require('express');
 const nodemailer = require('nodemailer');
 const cors = require('cors');
@@ -10,6 +14,9 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
+
+// Serve static files from the parent directory (counttracker-pro)
+app.use(express.static(path.join(__dirname, '..')));
 
 // In-memory OTP storage (In production, use Redis or a DB with TTL)
 const otpStore = {};
@@ -41,7 +48,7 @@ app.post('/api/otp/send', async (req, res) => {
 
     otpStore[email] = { otp, expiresAt };
 
-    const subject = type === 'register' ? 'CountTracker Pro - Verification Code' : 'CountTracker Pro - Password Reset Code';
+    const subject = type === 'register' ? 'Flow - Verification Code' : 'Flow - Password Reset Code';
     const message = `Your OTP code is: ${otp}. It will expire in 5 minutes.`;
 
     const mailOptions = {
@@ -51,7 +58,7 @@ app.post('/api/otp/send', async (req, res) => {
         text: message,
         html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
-                <h2 style="color: #6366f1; text-align: center;">CountTracker Pro</h2>
+                <h2 style="color: #6366f1; text-align: center;">Flow</h2>
                 <p>Hello,</p>
                 <p>You requested a code for <strong>${type === 'register' ? 'Account Registration' : 'Password Reset'}</strong>.</p>
                 <div style="background: #f3f4f6; padding: 15px; text-align: center; border-radius: 8px; margin: 20px 0;">
@@ -59,7 +66,7 @@ app.post('/api/otp/send', async (req, res) => {
                 </div>
                 <p>This code will expire in 5 minutes. If you did not request this, please ignore this email.</p>
                 <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
-                <p style="font-size: 12px; color: #6b7280; text-align: center;">&copy; 2026 CountTracker Pro. All rights reserved.</p>
+                <p style="font-size: 12px; color: #6b7280; text-align: center;">&copy; 2026 Flow. All rights reserved.</p>
             </div>
         `
     };
@@ -113,6 +120,16 @@ setInterval(() => {
         }
     }
 }, 10 * 60 * 1000);
+
+// Serve index.html for the root path
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'index.html'));
+});
+
+// Catch-all handler for SPA routes
+app.get(/^\/(?!api).*/, (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'index.html'));
+});
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);

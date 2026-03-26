@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!currentUser) return;
 
     await fetchHistory();
-    
+
     document.getElementById('date-filter').addEventListener('change', renderList);
 });
 
@@ -24,16 +24,16 @@ function renderList() {
     const filter = document.getElementById('date-filter').value;
     const container = document.getElementById('sessions-list');
     const emptyState = document.getElementById('empty-state');
-    
+
     container.innerHTML = '';
-    
+
     // Filter
     const now = new Date();
     let filtered = allSessions.filter(s => {
         if (filter === 'all') return true;
         const sDate = new Date(s.startedAt);
         const diffDays = (now - sDate) / (1000 * 60 * 60 * 24);
-        
+
         if (filter === 'today') return diffDays < 1;
         if (filter === '7days') return diffDays <= 7;
         if (filter === '30days') return diffDays <= 30;
@@ -44,16 +44,16 @@ function renderList() {
         emptyState.style.display = 'block';
         return;
     }
-    
+
     emptyState.style.display = 'none';
 
     filtered.forEach(session => {
         const div = document.createElement('div');
         div.className = 'session-card';
         div.onclick = () => openSessionDetails(session);
-        
+
         const isCompleted = session.status === 'completed';
-        
+
         div.innerHTML = `
             <div class="session-card-left">
                 <div class="session-title">
@@ -70,15 +70,15 @@ function renderList() {
                 <div class="session-duration">${formatTimeFromMs(session.durationMs)}</div>
             </div>
         `;
-        
+
         container.appendChild(div);
     });
 }
 
 async function openSessionDetails(session) {
     const milestones = await db.milestones.getBySession(currentUser.id, session.id);
-    milestones.sort((a,b) => a.count - b.count);
-    
+    milestones.sort((a, b) => a.count - b.count);
+
     let milestonesHtml = '';
     if (milestones.length > 0) {
         milestonesHtml = `
@@ -98,7 +98,7 @@ async function openSessionDetails(session) {
 
     const start = formatDate(session.startedAt);
     const end = session.endedAt ? formatDate(session.endedAt) : 'Currently Active';
-    
+
     const html = `
         <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom: 1rem;">
             <div>
@@ -126,12 +126,12 @@ async function openSessionDetails(session) {
     `;
 
     showModal('Session Details', html, 'Close', () => { return true; }, '');
-    
+
     // Hide cancel button in this modal since it's just dismissive
     setTimeout(() => {
         const cancelBtn = document.getElementById('modal-cancel-btn');
-        if(cancelBtn) cancelBtn.style.display = 'none';
+        if (cancelBtn) cancelBtn.style.display = 'none';
         const confirmBtn = document.getElementById('modal-confirm-btn');
-        if(confirmBtn) confirmBtn.textContent = 'Close';
+        if (confirmBtn) confirmBtn.textContent = 'Close';
     }, 20);
 }

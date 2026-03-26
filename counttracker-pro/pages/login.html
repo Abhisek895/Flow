@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - CountTracker Pro</title>
+    <title>Login - Flow</title>
     <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link rel="stylesheet" href="../css/base.css">
@@ -29,7 +30,7 @@
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 errorElement.textContent = '';
-                
+
                 const username = form.username.value.trim();
                 const password = form.password.value;
 
@@ -56,6 +57,7 @@
         });
     </script>
 </head>
+
 <body>
     <div class="auth-container">
         <div class="auth-card">
@@ -72,13 +74,16 @@
             <form id="login-form" class="auth-form">
                 <div class="input-group">
                     <label for="username">Username</label>
-                    <input type="text" id="username" name="username" placeholder="Enter your username" autocomplete="username">
+                    <input type="text" id="username" name="username" placeholder="Enter your username"
+                        autocomplete="username">
                 </div>
                 <div class="input-group">
                     <label for="password">Password</label>
-                    <input type="password" id="password" name="password" placeholder="Enter your password" autocomplete="current-password">
-                    <div style="text-align: right; margin-top: 5px;">
-                        <a href="forgot-password.html" style="font-size: 0.8rem; color: var(--text-secondary);">Forgot Password?</a>
+                    <input type="password" id="password" name="password" placeholder="Enter your password"
+                        autocomplete="current-password">
+                    <div style="text-align: right; margin-top: 5px; display: flex; justify-content: flex-end; gap: 0.75rem; font-size: 0.8rem;">
+                        <a href="forgot-password.html?mode=password" style="color: var(--text-secondary);">Forgot Password?</a>
+                        <a href="forgot-password.html?mode=username" style="color: var(--text-secondary);">Forgot Username?</a>
                     </div>
                 </div>
                 <button type="submit" id="submit-btn" class="btn btn-primary">Sign In</button>
@@ -90,4 +95,5 @@
         </div>
     </div>
 </body>
+
 </html>

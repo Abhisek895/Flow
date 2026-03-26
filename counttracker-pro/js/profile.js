@@ -11,10 +11,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Update Profile Summary (Username & Email)
     updateProfileSummary();
 
-    // Edit Profile Logic
-    const editProfileBtn = document.getElementById('btn-edit-profile');
-    if (editProfileBtn) {
-        editProfileBtn.addEventListener('click', handleEditProfile);
+    // Settings Modal Logic
+    const settingsBtn = document.getElementById('btn-open-settings');
+    if (settingsBtn) {
+        settingsBtn.addEventListener('click', handleSettings);
     }
 
     // Load Theme Preference
@@ -284,162 +284,296 @@ function updateProfileSummary() {
     summaryEl.innerHTML = `Username: <strong>${currentUser.username}</strong> | Email: <strong>${emailStr}</strong>`;
 }
 
-async function handleEditProfile() {
+async function handleSettings() {
     const bodyHtml = `
-        <div class="auth-form">
-            <p class="text-secondary mb-4">Update your account details. Changing your email requires verification.</p>
-            <div id="profile-modal-error" class="error-msg" style="margin-bottom: 1rem;"></div>
-            
-            <div id="profile-edit-step-1">
-                <div class="input-group">
-                    <label for="edit-username-input">Username</label>
-                    <input type="text" id="edit-username-input" placeholder="Username" value="${currentUser.username}">
-                </div>
-                <div class="input-group">
-                    <label for="edit-email-input">Email Address</label>
-                    <input type="email" id="edit-email-input" placeholder="example@gmail.com" value="${currentUser.email || ''}">
-                </div>
-                <button type="button" id="btn-save-profile" class="btn btn-primary w-full">Save Changes</button>
+        <div class="settings-modal-wrapper">
+            <!-- Tabs Navigation -->
+            <div class="tabs-header">
+                <button class="tab-btn active" data-tab="profile">Profile</button>
+                <button class="tab-btn" data-tab="security">Security</button>
             </div>
 
-            <div id="profile-edit-step-otp" style="display: none;">
-                <div class="text-center mb-4">
-                    <i class="ph ph-envelope-open" style="font-size: 3rem; color: var(--brand-primary);"></i>
-                    <p class="mt-2">A verification code was sent to <strong id="target-email-display"></strong></p>
+            <!-- Profile Tab Content -->
+            <div class="tab-content active" id="tab-profile">
+                <div class="auth-form" style="padding: 0;">
+                    <div id="profile-edit-step-1">
+                        <div class="input-group">
+                            <label>Username</label>
+                            <input type="text" id="set-username" value="${currentUser.username}">
+                        </div>
+                        <div class="input-group">
+                            <label>Email (View Only)</label>
+                            <input type="text" value="${currentUser.email || 'None'}" disabled style="opacity: 0.6;">
+                            <small style="color: var(--text-secondary);">Change email in the Security tab.</small>
+                        </div>
+                        <button id="btn-update-username" class="btn btn-primary w-full">Update Username</button>
+                    </div>
                 </div>
-                <div class="input-group">
-                    <label for="profile-otp-input">Enter OTP</label>
-                    <input type="text" id="profile-otp-input" placeholder="6-digit code" maxlength="6" style="text-align: center; font-size: 1.5rem; letter-spacing: 5px;">
+            </div>
+
+            <!-- Security Tab Content -->
+            <div class="tab-content" id="tab-security">
+                <!-- Reset Password Section -->
+                <div class="security-action-card">
+                    <div class="security-info">
+                        <h5>Reset Password</h5>
+                        <p>Receive a code via email to update your credentials.</p>
+                    </div>
+                    <button class="btn btn-secondary btn-sm" id="btn-init-pwd-reset">Reset</button>
                 </div>
-                <button type="button" id="btn-verify-profile-otp" class="btn btn-primary w-full">Verify & Update Profile</button>
-                <p class="text-center mt-4">
-                    <a href="#" id="btn-back-to-edit">Back to Edit</a>
-                </p>
+
+                <!-- Change Email Section -->
+                <div class="security-action-card">
+                    <div class="security-info">
+                        <h5>${currentUser.email ? 'Change Email' : 'Link Email'}</h5>
+                        <p>${currentUser.email ? 'Update your linked email address. Requires dual verification.' : 'Connect an email to your account for recovery and security.'}</p>
+                    </div>
+                    <button class="btn btn-secondary btn-sm" id="btn-init-email-change">${currentUser.email ? 'Change' : 'Link'}</button>
+                </div>
+
+                <!-- Security Flows Container (Dynamic) -->
+                <div id="security-flow-container" style="display:none; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
+                    <div id="security-flow-content"></div>
+                </div>
             </div>
         </div>
     `;
 
-    showModal('Edit Profile', bodyHtml, '', null, 'Cancel');
-
-    // Hide default confirm button
+    showModal('Account Settings', bodyHtml, '', null, 'Close');
+    
+    // Hide confirm button
     const confirmBtn = document.getElementById('modal-confirm-btn');
     if (confirmBtn) confirmBtn.style.display = 'none';
 
-    const saveBtn = document.getElementById('btn-save-profile');
-    const verifyBtn = document.getElementById('btn-verify-profile-otp');
-    const backBtn = document.getElementById('btn-back-to-edit');
-    const usernameInput = document.getElementById('edit-username-input');
-    const emailInput = document.getElementById('edit-email-input');
-    const otpInput = document.getElementById('profile-otp-input');
-    const errorEl = document.getElementById('profile-modal-error');
-    const step1 = document.getElementById('profile-edit-step-1');
-    const stepOtp = document.getElementById('profile-edit-step-otp');
-    const targetEmailDisplay = document.getElementById('target-email-display');
+    // Tab Switching Logic
+    const tabs = document.querySelectorAll('.tab-btn');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            tab.classList.add('active');
+            document.getElementById(`tab-${tab.dataset.tab}`).classList.add('active');
+        });
+    });
 
-    let newUsername = '';
+    // --- Profile Logic ---
+    const updateUsernameBtn = document.getElementById('btn-update-username');
+    updateUsernameBtn.addEventListener('click', async () => {
+        const newUsername = document.getElementById('set-username').value.trim();
+        if (!newUsername || newUsername === currentUser.username) return;
+
+        updateUsernameBtn.disabled = true;
+        updateUsernameBtn.innerHTML = '<i class="ph ph-spinner-gap ph-spin"></i> Updating...';
+
+        try {
+            const existing = await db.users.getByUsername(newUsername);
+            if (existing) throw new Error('Username already taken.');
+
+            await db.users.update(currentUser.id, { username: newUsername });
+            currentUser.username = newUsername;
+            document.getElementById('profile-username').textContent = currentUser.username;
+            document.getElementById('profile-avatar').textContent = generateAvatar(newUsername);
+            updateProfileSummary();
+            showToast('Username updated!');
+        } catch (err) {
+            showToast(err.message, 'error');
+        } finally {
+            updateUsernameBtn.disabled = false;
+            updateUsernameBtn.innerHTML = 'Update Username';
+        }
+    });
+
+    // --- Security Logic: Reset Password ---
+    document.getElementById('btn-init-pwd-reset').addEventListener('click', () => {
+        startPasswordResetFlow();
+    });
+
+    // --- Security Logic: Change Email ---
+    document.getElementById('btn-init-email-change').addEventListener('click', () => {
+        startEmailChangeFlow();
+    });
+}
+
+/**
+ * PASSWORD RESET FLOW
+ */
+async function startPasswordResetFlow() {
+    if (!currentUser.email) {
+        showToast('Please link an email to your profile first.', 'error');
+        return;
+    }
+
+    const flowContainer = document.getElementById('security-flow-container');
+    const flowContent = document.getElementById('security-flow-content');
+    
+    flowContainer.style.display = 'block';
+    flowContent.innerHTML = `
+        <div class="auth-form" style="padding:0;">
+            <p class="mb-4">We'll send a code to <strong>${currentUser.email}</strong> to verify it's you.</p>
+            <div class="input-group">
+                <label>Verification Code</label>
+                <input type="text" id="pwd-reset-otp" placeholder="6-digit OTP" maxlength="6" style="text-align:center; font-size: 1.25rem;">
+            </div>
+            <div id="pwd-new-fields" style="display:none;">
+                <div class="input-group">
+                    <label>New Password</label>
+                    <input type="password" id="new-password-val" placeholder="Min 6 characters">
+                </div>
+            </div>
+            <button id="btn-pwd-reset-action" class="btn btn-primary w-full">Send Code</button>
+            <button id="btn-cancel-flow" class="btn btn-link w-full mt-2">Cancel</button>
+        </div>
+    `;
+
+    const actionBtn = document.getElementById('btn-pwd-reset-action');
+    let step = 'send'; // 'send' -> 'verify' -> 'update'
+
+    actionBtn.addEventListener('click', async () => {
+        try {
+            if (step === 'send') {
+                actionBtn.disabled = true;
+                actionBtn.innerHTML = '<i class="ph ph-spinner-gap ph-spin"></i> Sending...';
+                await sendOTP(currentUser.email, 'reset');
+                showToast('OTP code sent!');
+                step = 'verify';
+                actionBtn.disabled = false;
+                actionBtn.innerHTML = 'Verify Code';
+            } else if (step === 'verify') {
+                const otp = document.getElementById('pwd-reset-otp').value.trim();
+                actionBtn.disabled = true;
+                await verifyOTP(currentUser.email, otp);
+                showToast('Verified! Enter your new password.');
+                document.getElementById('pwd-new-fields').style.display = 'block';
+                document.getElementById('pwd-reset-otp').disabled = true; // lock otp
+                step = 'update';
+                actionBtn.disabled = false;
+                actionBtn.innerHTML = 'Update Password';
+            } else if (step === 'update') {
+                const newPwd = document.getElementById('new-password-val').value;
+                if (newPwd.length < 6) throw new Error('Password too short.');
+
+                actionBtn.disabled = true;
+                const hashed = await hashPassword(newPwd);
+                await db.users.update(currentUser.id, { passwordHash: hashed });
+                currentUser.passwordHash = hashed;
+                showToast('Password updated successfully!', 'success');
+                flowContainer.style.display = 'none';
+            }
+        } catch (err) {
+            showToast(err.message, 'error');
+            actionBtn.disabled = false;
+        }
+    });
+
+    document.getElementById('btn-cancel-flow').addEventListener('click', () => {
+        flowContainer.style.display = 'none';
+    });
+}
+
+/**
+ * EMAIL CHANGE FLOW
+ */
+async function startEmailChangeFlow() {
+    const flowContainer = document.getElementById('security-flow-container');
+    const flowContent = document.getElementById('security-flow-content');
+    
+    flowContainer.style.display = 'block';
+    flowContent.innerHTML = `
+        <div class="auth-form" style="padding:0;">
+            <div id="email-change-step-1">
+                <p class="mb-4 text-secondary">${currentUser.email ? 'To change your email, we need to verify both your current and new address.' : 'Enter the email address you would like to link to your account.'}</p>
+                <div class="input-group">
+                    <label>New Email Address</label>
+                    <input type="email" id="new-email-val" placeholder="new-email@example.com">
+                </div>
+                <button id="btn-email-next" class="btn btn-primary w-full">${currentUser.email ? 'Verify Addresses' : 'Send Verification Code'}</button>
+            </div>
+
+            <div id="email-change-step-otp" style="display:none;">
+                <p class="mb-4">Enter the code${currentUser.email ? 's' : ''} sent to ${currentUser.email ? 'both emails' : 'your email'}.</p>
+                ${currentUser.email ? `
+                <div class="input-group">
+                    <label>OTP sent to <br><small>${currentUser.email}</small></label>
+                    <input type="text" id="otp-old" placeholder="Old Email Code" maxlength="6">
+                </div>
+                ` : ''}
+                <div class="input-group">
+                    <label>OTP sent to <br><small id="new-email-display"></small></label>
+                    <input type="text" id="otp-new" placeholder="Verification Code" maxlength="6">
+                </div>
+                <button id="btn-email-verify-final" class="btn btn-primary w-full">${currentUser.email ? 'Confirm Change' : 'Link Email'}</button>
+            </div>
+            
+            <button id="btn-cancel-flow" class="btn btn-link w-full mt-2">Cancel</button>
+        </div>
+    `;
+
+    const nextBtn = document.getElementById('btn-email-next');
+    const finalBtn = document.getElementById('btn-email-verify-final');
     let newEmail = '';
 
-    saveBtn.addEventListener('click', async () => {
-        newUsername = usernameInput.value.trim();
-        newEmail = emailInput.value.trim();
+    nextBtn.addEventListener('click', async () => {
+        newEmail = document.getElementById('new-email-val').value.trim().toLowerCase();
+        if (!newEmail || newEmail === currentUser.email) return;
 
-        if (!newUsername) {
-            errorEl.textContent = 'Username cannot be empty.';
-            return;
-        }
-
-        errorEl.textContent = '';
-        saveBtn.disabled = true;
-        saveBtn.innerHTML = '<i class="ph ph-spinner-gap ph-spin"></i> Checking...';
+        nextBtn.disabled = true;
+        nextBtn.innerHTML = '<i class="ph ph-spinner-gap ph-spin"></i> Sending Codes...';
 
         try {
-            // Check username availability if changed
-            if (newUsername !== currentUser.username) {
-                const existingUser = await db.users.getByUsername(newUsername);
-                if (existingUser) {
-                    throw new Error('Username already taken.');
-                }
+            // Check availability
+            const existing = await db.users.getByEmail(newEmail);
+            if (existing) throw new Error('Email already in use.');
+
+            // Send to both if old email exists
+            if (currentUser.email) {
+                await sendOTP(currentUser.email, 'reset'); // reuse code
             }
+            await sendOTP(newEmail, 'register');
 
-            // If email changed, require OTP
-            if (newEmail !== (currentUser.email || '')) {
-                if (!newEmail) throw new Error('Email cannot be empty if you want to link/change it.');
-
-                // Check email availability
-                const existingEmail = await db.users.getByEmail(newEmail);
-                if (existingEmail && existingEmail.id !== currentUser.id) {
-                    throw new Error('Email already linked to another account.');
-                }
-
-                await sendOTP(newEmail, 'register'); // reuse register type for verification
-
-                targetEmailDisplay.textContent = newEmail;
-                step1.style.display = 'none';
-                stepOtp.style.display = 'block';
-                showToast('Verification code sent.');
-            } else {
-                // Only username changed or nothing changed
-                if (newUsername !== currentUser.username) {
-                    await db.users.update(currentUser.id, { username: newUsername });
-                    currentUser.username = newUsername;
-
-                    // Update UI immediately
-                    document.getElementById('profile-username').textContent = currentUser.username;
-                    document.getElementById('profile-avatar').textContent = generateAvatar(currentUser.username);
-                    updateProfileSummary();
-                    showToast('Username updated successfully!', 'success');
-                }
-                document.getElementById('modal-close-btn').click();
-            }
+            document.getElementById('new-email-display').textContent = newEmail;
+            document.getElementById('email-change-step-1').style.display = 'none';
+            document.getElementById('email-change-step-otp').style.display = 'block';
+            showToast('Verification codes sent to both emails!');
         } catch (err) {
-            errorEl.textContent = err.message || 'Error updating profile.';
-            saveBtn.disabled = false;
-            saveBtn.innerHTML = 'Save Changes';
+            showToast(err.message, 'error');
+        } finally {
+            nextBtn.disabled = false;
+            nextBtn.innerHTML = currentUser.email ? 'Verify Addresses' : 'Send Verification Code';
         }
     });
 
-    verifyBtn.addEventListener('click', async () => {
-        const otp = otpInput.value.trim();
-        if (!otp) {
-            errorEl.textContent = 'Please enter the OTP.';
-            return;
-        }
+    finalBtn.addEventListener('click', async () => {
+        const otpOldEl = document.getElementById('otp-old');
+        const otpNewEl = document.getElementById('otp-new');
+        
+        const otpOld = otpOldEl ? otpOldEl.value.trim() : '';
+        const otpNew = otpNewEl ? otpNewEl.value.trim() : '';
 
-        errorEl.textContent = '';
-        verifyBtn.disabled = true;
-        verifyBtn.innerHTML = '<i class="ph ph-spinner-gap ph-spin"></i> Verifying...';
+        if (currentUser.email && !otpOld) return showToast('Old email OTP required.', 'error');
+        if (!otpNew) return showToast('New email OTP required.', 'error');
 
+        finalBtn.disabled = true;
         try {
-            await verifyOTP(newEmail, otp);
+            // Verify both
+            if (currentUser.email) {
+                await verifyOTP(currentUser.email, otpOld);
+            }
+            await verifyOTP(newEmail, otpNew);
 
-            // Success! Update both (in case username was also changed)
-            await db.users.update(currentUser.id, {
-                username: newUsername,
-                email: newEmail
-            });
-
-            currentUser.username = newUsername;
+            // Update
+            await db.users.update(currentUser.id, { email: newEmail });
             currentUser.email = newEmail;
-
-            // Update UI
-            document.getElementById('profile-username').textContent = currentUser.username;
-            document.getElementById('profile-avatar').textContent = generateAvatar(currentUser.username);
             updateProfileSummary();
-
-            showToast('Profile updated successfully!', 'success');
-            document.getElementById('modal-close-btn').click();
+            showToast('Email updated successfully!', 'success');
+            flowContainer.style.display = 'none';
         } catch (err) {
-            errorEl.textContent = err.message || 'Invalid OTP.';
-            verifyBtn.disabled = false;
-            verifyBtn.innerHTML = 'Verify & Update Profile';
+            showToast(err.message, 'error');
+        } finally {
+            finalBtn.disabled = false;
         }
     });
 
-    backBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        stepOtp.style.display = 'none';
-        step1.style.display = 'block';
-        saveBtn.disabled = false;
-        saveBtn.innerHTML = 'Save Changes';
+    document.getElementById('btn-cancel-flow').addEventListener('click', () => {
+        flowContainer.style.display = 'none';
     });
 }

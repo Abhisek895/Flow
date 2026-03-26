@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - CountTracker Pro</title>
+    <title>Register - Flow</title>
     <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link rel="stylesheet" href="../css/base.css">
@@ -35,7 +36,7 @@
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 errorElement.textContent = '';
-                
+
                 const username = form.username.value.trim();
                 const email = form.email.value.trim();
                 const password = form.password.value;
@@ -67,23 +68,23 @@
                     if (existingEmail) throw new Error('Email already registered.');
 
                     await sendOTP(email, 'register');
-                    
+
                     registrationData = { username, email, password };
-                    
+
                     // Show OTP section
                     mainFields.style.display = 'none';
                     otpSection.style.display = 'block';
                     btn.style.display = 'none';
                     showToast('OTP sent to your email!');
                 } catch (err) {
-        if (err.message === 'Failed to fetch') {
-            errorElement.textContent = 'Backend server is not running. Please start the server at counttracker-pro/server';
-        } else {
-            errorElement.textContent = err.message || 'Failed to send OTP.';
-        }
-        btn.disabled = false;
-        btn.innerHTML = 'Create Account';
-    }
+                    if (err.message === 'Failed to fetch') {
+                        errorElement.textContent = 'Backend server is not running. Please start the server at counttracker-pro/server';
+                    } else {
+                        errorElement.textContent = err.message || 'Failed to send OTP.';
+                    }
+                    btn.disabled = false;
+                    btn.innerHTML = 'Create Account';
+                }
             });
 
             verifyBtn.addEventListener('click', async () => {
@@ -98,27 +99,28 @@
 
                 try {
                     await verifyOTP(registrationData.email, otp);
-                    
+
                     // Proceed with registration
                     await register(registrationData.username, registrationData.email, registrationData.password);
-                    
+
                     showToast('Registration successful! Redirecting...');
                     setTimeout(() => {
                         window.location.href = 'login.html';
                     }, 1000);
                 } catch (err) {
-        if (err.message === 'Failed to fetch') {
-            errorElement.textContent = 'Backend server is not running. Please start the server at counttracker-pro/server';
-        } else {
-            errorElement.textContent = err.message || 'OTP verification failed.';
-        }
-        verifyBtn.disabled = false;
-        verifyBtn.innerHTML = 'Verify & Register';
-    }
+                    if (err.message === 'Failed to fetch') {
+                        errorElement.textContent = 'Backend server is not running. Please start the server at counttracker-pro/server';
+                    } else {
+                        errorElement.textContent = err.message || 'OTP verification failed.';
+                    }
+                    verifyBtn.disabled = false;
+                    verifyBtn.innerHTML = 'Verify & Register';
+                }
             });
         });
     </script>
 </head>
+
 <body>
     <div class="auth-container">
         <div class="auth-card">
@@ -136,7 +138,8 @@
                 <div id="main-fields">
                     <div class="input-group">
                         <label for="username">Username</label>
-                        <input type="text" id="username" name="username" placeholder="Choose a username" autocomplete="username">
+                        <input type="text" id="username" name="username" placeholder="Choose a username"
+                            autocomplete="username">
                     </div>
                     <div class="input-group">
                         <label for="email">Email Address</label>
@@ -144,19 +147,23 @@
                     </div>
                     <div class="input-group">
                         <label for="password">Password</label>
-                        <input type="password" id="password" name="password" placeholder="Create a password" autocomplete="new-password">
+                        <input type="password" id="password" name="password" placeholder="Create a password"
+                            autocomplete="new-password">
                     </div>
                     <div class="input-group">
                         <label for="confirmPassword">Confirm Password</label>
-                        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" autocomplete="new-password">
+                        <input type="password" id="confirmPassword" name="confirmPassword"
+                            placeholder="Confirm your password" autocomplete="new-password">
                     </div>
                 </div>
 
                 <div id="otp-section" style="display: none;">
-                    <p class="text-secondary mb-4">An OTP has been sent to your email. Please enter it below to verify your account.</p>
+                    <p class="text-secondary mb-4">An OTP has been sent to your email. Please enter it below to verify
+                        your account.</p>
                     <div class="input-group">
                         <label for="otp">Enter OTP</label>
-                        <input type="text" id="otp" name="otp" placeholder="6-digit code" maxlength="6" style="text-align: center; font-size: 1.5rem; letter-spacing: 5px;">
+                        <input type="text" id="otp" name="otp" placeholder="6-digit code" maxlength="6"
+                            style="text-align: center; font-size: 1.5rem; letter-spacing: 5px;">
                     </div>
                     <button type="button" id="verify-btn" class="btn btn-primary w-full">Verify & Register</button>
                     <p class="text-center mt-4">
@@ -173,4 +180,5 @@
         </div>
     </div>
 </body>
+
 </html>

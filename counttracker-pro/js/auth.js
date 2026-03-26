@@ -29,7 +29,7 @@ async function register(username, email, password) {
 
     const passwordHash = await hashPassword(password);
     const now = new Date().toISOString();
-    
+
     const newUser = {
         id: generateUUID(),
         username,
@@ -82,7 +82,7 @@ async function requireAuth() {
         window.location.href = './login.html';
         return null;
     }
-    
+
     // Apply theme
     applyTheme(user.settings.theme);
     return user;

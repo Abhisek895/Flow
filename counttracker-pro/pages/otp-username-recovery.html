@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify OTP - Recover Username</title>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/auth.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <style>
+        .form-hint {
+            font-size: 0.85rem;
+            color: #6b7280;
+            margin-bottom: 1.5rem;
+            padding: 0.75rem 1rem;
+            background: #f3f4f6;
+            border-radius: 6px;
+            border-left: 3px solid #f59e0b;
+        }
+
+        .username-display {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #f59e0b15, #d9770615);
+            border: 2px solid #f59e0b;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .username-display p {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .username-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f2937;
+            word-break: break-all;
+            margin-bottom: 1rem;
+            font-family: 'Courier New', monospace;
+        }
+
+        .copy-btn {
+            padding: 0.6rem 1.2rem;
+            background: #f59e0b;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .copy-btn:hover {
+            background: #d97706;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        }
+
+        .copy-btn:active {
+            transform: translateY(0);
+        }
+
+        .copy-success {
+            font-size: 0.85rem;
+            color: #10b981;
+            margin-top: 0.5rem;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .resend-wrapper {
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+
+        .resend-wrapper a {
+            color: #f59e0b;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .resend-wrapper a:hover {
+            text-decoration: underline;
+        }
+    </style>
+    <script src="../js/utils.js"></script>
+    <script src="../js/db.js"></script>
+    <script src="../js/ui.js"></script>
+    <script src="../js/auth.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const email = urlParams.get('email') || '';
+
+            const errorElement = document.getElementById('error-msg');
+            const verifyBtn = document.getElementById('verify-btn');
+            const otpInput = document.getElementById('otp');
+            const usernameDisplay = document.getElementById('username-display');
+
+            otpInput.addEventListener('input', (e) => {
+                if (e.target.value.length === 6) {
+                    verifyUsernameOTP();
+                }
+            });
+
+            async function verifyUsernameOTP() {
+                const otp = otpInput.value.trim();
+
+                if (!otp || otp.length !== 6) {
+                    errorElement.textContent = 'Please enter a valid 6-digit OTP.';
+                    return;
+                }
+
+                errorElement.textContent = '';
+                verifyBtn.disabled = true;
+                verifyBtn.innerHTML = '<i class="ph ph-spinner-gap ph-spin"></i> Verifying...';
+
+                try {
+                    await verifyOTP(email, otp);
+                    const user = await db.users.getByEmail(email);
+                    if (!user) throw new Error('No account found with this email.');
+
+                    showToast('Username revealed successfully!');
+                    
+                    usernameDisplay.innerHTML = `
+                        <p>Your Username is:</p>
+                        <div class="username-value">${user.username}</div>
+                        <button type="button" class="copy-btn" id="copy-btn">
+                            <i class="ph ph-copy"></i> Copy Username
+                        </button>
+                        <div class="copy-success" id="copy-success">
+                            <i class="ph ph-check-circle"></i> Copied to clipboard!
+                        </div>
+                    `;
+                    usernameDisplay.style.display = 'block';
+
+                    document.getElementById('copy-btn').addEventListener('click', () => {
+                        navigator.clipboard.writeText(user.username).then(() => {
+                            const successMsg = document.getElementById('copy-success');
+                            successMsg.style.display = 'block';
+                            setTimeout(() => {
+                                successMsg.style.display = 'none';
+                            }, 2000);
+                        });
+                    });
+
+                    verifyBtn.disabled = true;
+                    verifyBtn.innerHTML = '<i class="ph ph-check-circle"></i> Username Revealed';
+
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 4000);
+                } catch (err) {
+                    errorElement.textContent = err.message || 'Invalid OTP. Please try again.';
+                    verifyBtn.disabled = false;
+                    verifyBtn.innerHTML = 'Reveal Username';
+                    otpInput.value = '';
+                    otpInput.focus();
+                }
+            }
+
+            verifyBtn.addEventListener('click', verifyUsernameOTP);
+        });
+    </script>
+</head>
+
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="auth-logo">
+                    <i class="ph ph-user-circle"></i>
+                </div>
+                <h1 class="auth-title">Recover Username</h1>
+                <p class="auth-subtitle">Verify your identity to reveal your username</p>
+            </div>
+
+            <div id="error-msg" class="error-msg"></div>
+
+            <div class="form-hint">
+                <i class="ph ph-info"></i> Enter the 6-digit code we sent to your email
+            </div>
+
+            <div class="auth-form">
+                <div class="input-group">
+                    <label for="otp">OTP Code</label>
+                    <input type="text" id="otp" name="otp" placeholder="000000" maxlength="6" 
+                        style="text-align: center; font-size: 1.5rem; letter-spacing: 10px; font-weight: 700;">
+                </div>
+                <button type="button" id="verify-btn" class="btn btn-warning w-full">Reveal Username</button>
+            </div>
+
+            <div id="username-display" class="username-display" style="display: none;"></div>
+
+            <div class="resend-wrapper">
+                Didn't receive the code? <a href="forgot-password.html">Try again</a>
+            </div>
+
+            <div class="auth-footer">
+                <a href="forgot-password.html">Back to Account Recovery</a>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

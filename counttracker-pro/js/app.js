@@ -8,7 +8,7 @@ async function initApp(pageId) {
 
     renderLayout(pageId);
     setupInteractions();
-    
+
     // Initialize notification checks if enabled
     if (currentUser.settings && currentUser.settings.notifications) {
         setupNotificationChecks();
@@ -24,6 +24,7 @@ function renderLayout(activePage) {
         { id: 'counter', icon: 'ph-plus-circle', label: 'Counter', url: 'counter.html' },
         { id: 'history', icon: 'ph-clock-counter-clockwise', label: 'History', url: 'history.html' },
         { id: 'analytics', icon: 'ph-chart-bar', label: 'Analytics', url: 'analytics.html' },
+        { id: 'manual-adjustment', icon: 'ph-calculator', label: 'Adjust Count', url: 'manual-adjustment.html' },
         { id: 'profile', icon: 'ph-user', label: 'Profile', url: 'profile.html' }
     ];
 
@@ -109,7 +110,7 @@ function setupInteractions() {
     const logoutBtn = document.getElementById('logout-btn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', () => {
-             logout();
+            logout();
         });
     }
 
@@ -120,7 +121,7 @@ function setupInteractions() {
         menuToggle.addEventListener('click', () => {
             sidebar.classList.toggle('open');
         });
-        
+
         // Close sidebar when clicking outside on mobile
         document.addEventListener('click', (e) => {
             if (window.innerWidth <= 768 && !sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
@@ -135,7 +136,7 @@ function setupInteractions() {
         themeToggleBtn.addEventListener('click', async () => {
             const isDark = document.documentElement.classList.contains('dark');
             const newTheme = isDark ? 'light' : 'dark';
-            
+
             // Apply visually
             if (newTheme === 'dark') {
                 document.documentElement.classList.add('dark');
@@ -209,12 +210,12 @@ let notificationInterval = null;
 
 function setupNotificationChecks() {
     if (!("Notification" in window)) return;
-    
+
     // Request permission if not already granted but settings say enabled
     if (Notification.permission !== "granted" && Notification.permission !== "denied") {
         Notification.requestPermission();
     }
-    
+
     // Check every minute
     if (notificationInterval) clearInterval(notificationInterval);
     notificationInterval = setInterval(checkAndSendNotification, 60000);
@@ -236,9 +237,9 @@ function checkAndSendNotification() {
     const now = new Date();
     const currentHour = now.getHours();
     const currentMinute = now.getMinutes();
-    
+
     const isNotifyTime = NOTIFY_TIMES.some(t => t.h === currentHour && t.m === currentMinute);
-    
+
     if (isNotifyTime) {
         const timeStamp = `${currentHour}:${currentMinute}`;
         const lastNotifiedTime = localStorage.getItem('lastNotifiedTime');
@@ -246,7 +247,7 @@ function checkAndSendNotification() {
         if (lastNotifiedTime !== timeStamp) {
             // Pick a random quote
             const randomQuote = DEVOTIONAL_QUOTES[Math.floor(Math.random() * DEVOTIONAL_QUOTES.length)];
-            
+
             new Notification("Devotional Reminder ✨", {
                 body: randomQuote,
                 icon: 'https://cdn-icons-png.flaticon.com/512/3592/3592868.png',
@@ -260,7 +261,7 @@ function checkAndSendNotification() {
                 const peacockAudio = new Audio('https://upload.wikimedia.org/wikipedia/commons/4/44/Peacock.ogg');
                 peacockAudio.volume = 1.0;
                 peacockAudio.play().catch(e => console.warn('Browser blocked auto-play of peacock audio:', e));
-            } catch (e) {}
+            } catch (e) { }
 
             localStorage.setItem('lastNotifiedTime', timeStamp);
         }

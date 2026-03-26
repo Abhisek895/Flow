@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>History - CountTracker Pro</title>
+    <title>History - Flow</title>
     <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link rel="stylesheet" href="../css/base.css">
@@ -11,9 +12,12 @@
     <link rel="stylesheet" href="../css/components.css">
     <link rel="stylesheet" href="../css/history.css">
     <style>
-        #temp-content { display: none; }
+        #temp-content {
+            display: none;
+        }
     </style>
 </head>
+
 <body>
     <div id="app-layout">
         <div class="loader-container">
@@ -25,7 +29,7 @@
         <div class="dashboard-section">
             <div class="history-controls">
                 <h2 style="margin:0;"><i class="ph ph-clock-counter-clockwise text-primary"></i> Session History</h2>
-                
+
                 <div class="filter-group">
                     <label for="date-filter" class="text-secondary" style="font-size: 0.875rem;">Timeframe:</label>
                     <select id="date-filter" class="filter-select">
@@ -43,12 +47,13 @@
                     <i class="ph ph-spinner-gap ph-spin text-primary" style="font-size: 2rem;"></i>
                 </div>
             </div>
-            
+
             <div id="empty-state" style="display: none; text-align: center; padding: 4rem 1rem;">
                 <i class="ph ph-folder-open text-secondary" style="font-size: 4rem; margin-bottom: 1rem;"></i>
                 <h3>No sessions found</h3>
                 <p class="text-secondary">Start counting to build your history.</p>
-                <button class="btn btn-primary mt-4" onclick="window.location.href='counter.html'">Go to Counter</button>
+                <button class="btn btn-primary mt-4" onclick="window.location.href='counter.html'">Go to
+                    Counter</button>
             </div>
         </div>
     </div>
@@ -60,4 +65,5 @@
     <script src="../js/app.js"></script>
     <script src="../js/history.js"></script>
 </body>
+
 </html>

@@ -9,8 +9,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function loadAnalytics() {
     try {
-        const userId        = currentUser.id;
-        const allSessions   = await db.sessions.getByUser(userId);
+        const userId = currentUser.id;
+        const allSessions = await db.sessions.getByUser(userId);
         const allDailyStats = await db.dailyStats.getByUser(userId);
 
         // 1. Streak
@@ -26,14 +26,14 @@ async function loadAnalytics() {
         // 2. Monthly / weekly totals
         let monthlyTotal = 0, last7Total = 0;
         const thirtyAgo = new Date(); thirtyAgo.setDate(thirtyAgo.getDate() - 30);
-        const sevenAgo  = new Date(); sevenAgo.setDate(sevenAgo.getDate() - 7);
+        const sevenAgo = new Date(); sevenAgo.setDate(sevenAgo.getDate() - 7);
         allDailyStats.forEach(s => {
             const dt = new Date(s.date);
             if (dt >= thirtyAgo) monthlyTotal += s.totalCount;
-            if (dt >= sevenAgo)  last7Total   += s.totalCount;
+            if (dt >= sevenAgo) last7Total += s.totalCount;
         });
         document.getElementById('stat-monthly-total').textContent = monthlyTotal.toLocaleString();
-        document.getElementById('stat-weekly-avg').textContent    = Math.round(last7Total / 7) + '/day';
+        document.getElementById('stat-weekly-avg').textContent = Math.round(last7Total / 7) + '/day';
 
         // 3. Best day
         let best = 0;
@@ -54,10 +54,10 @@ async function loadAnalytics() {
             hourCounts[h] += s.endCount || 0;
         });
         const peakHour = hourCounts.indexOf(Math.max(...hourCounts));
-        const peakEl   = document.getElementById('stat-peak-hour');
+        const peakEl = document.getElementById('stat-peak-hour');
         if (Math.max(...hourCounts) > 0) {
             const suffix = peakHour < 12 ? 'AM' : 'PM';
-            const h12    = peakHour % 12 || 12;
+            const h12 = peakHour % 12 || 12;
             peakEl.textContent = `${h12} ${suffix}`;
         } else {
             peakEl.textContent = '—';
@@ -115,7 +115,7 @@ function renderMonthlyChart(allDailyStats, days) {
 
 /* ── Pie Chart ─────────────────────────────────────── */
 function renderDurationChart(allSessions) {
-    const body   = document.getElementById('durationChart').parentElement;
+    const body = document.getElementById('durationChart').parentElement;
     const canvas = document.getElementById('durationChart');
     let short = 0, med = 0, long = 0;
     allSessions.forEach(s => {
@@ -131,7 +131,7 @@ function renderDurationChart(allSessions) {
         type: 'pie',
         data: {
             labels: ['< 5 mins', '5–30 mins', '> 30 mins'],
-            datasets: [{ data: [short, med, long], backgroundColor: ['#3b82f6','#8b5cf6','#10b981'], borderWidth: 0 }]
+            datasets: [{ data: [short, med, long], backgroundColor: ['#3b82f6', '#8b5cf6', '#10b981'], borderWidth: 0 }]
         },
         options: {
             responsive: true, maintainAspectRatio: false,
@@ -145,9 +145,9 @@ function renderDurationChart(allSessions) {
 
 /* ── NEW: Day of Week Bar Chart ─────────────────────── */
 function renderWeekdayChart(allDailyStats) {
-    const body   = document.getElementById('weekdayChart').parentElement;
+    const body = document.getElementById('weekdayChart').parentElement;
     const canvas = document.getElementById('weekdayChart');
-    const days   = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     const totals = new Array(7).fill(0);
 
     allDailyStats.forEach(s => {
@@ -183,7 +183,7 @@ function renderWeekdayChart(allDailyStats) {
 /* ── Top Sessions ──────────────────────────────────── */
 function renderTopSessions(allSessions) {
     const container = document.getElementById('top-sessions-list');
-    const sorted    = [...allSessions].sort((a, b) => b.endCount - a.endCount).slice(0, 5);
+    const sorted = [...allSessions].sort((a, b) => b.endCount - a.endCount).slice(0, 5);
     if (sorted.length === 0 || sorted[0].endCount === 0) {
         container.innerHTML = '<div class="anx-empty">No session data yet</div>';
         return;

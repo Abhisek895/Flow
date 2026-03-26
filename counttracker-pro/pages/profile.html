@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile - CountTracker Pro</title>
+    <title>Profile - Flow</title>
     <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link rel="stylesheet" href="../css/base.css">
@@ -41,15 +41,15 @@
                 <div class="settings-group-header">
                     <i class="ph ph-gear"></i> Application Settings
                 </div>
-                <!-- Edit Profile -->
-                <div class="setting-item" id="edit-profile-item">
+                <!-- Settings -->
+                <div class="setting-item" id="settings-profile-item">
                     <div class="setting-info">
-                        <h4>Edit Profile</h4>
-                        <p id="profile-details-summary">Update your username and account email.</p>
+                        <h4>Settings</h4>
+                        <p id="profile-details-summary">Manage your profile, email, and security.</p>
                     </div>
                     <div>
-                        <button class="btn btn-secondary" id="btn-edit-profile">
-                            <i class="ph ph-user-focus"></i> Edit Details
+                        <button class="btn btn-secondary" id="btn-open-settings">
+                            <i class="ph ph-gear"></i> Open Settings
                         </button>
                     </div>
                 </div>
@@ -74,6 +74,24 @@
                         <input type="checkbox" id="notifications-toggle">
                         <span class="toggle-slider"></span>
                     </label>
+                </div>
+            </div>
+
+            <!-- Manual Count Adjustment -->
+            <div class="settings-group">
+                <div class="settings-group-header">
+                    <i class="ph ph-calculator"></i> Manual Count Adjustment
+                </div>
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <h4>Adjust Daily Count</h4>
+                        <p>Manually add or subtract counts for a specific day.</p>
+                    </div>
+                    <div>
+                        <a href="manual-adjustment.html" class="btn btn-primary">
+                            <i class="ph ph-arrow-right"></i> Open Adjustment Tool
+                        </a>
+                    </div>
                 </div>
             </div>
 
